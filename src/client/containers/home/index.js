@@ -14,12 +14,27 @@ const selected = {
     ],
     tags: []
 };
+
 /* eslint-enable */
 
 export class Home extends Component {
 
     constructor(props) {
         super(props);
+        this.state = {
+            primitiveType: 'rect',
+            shouldSaveRegion: false
+        };
+        this.setPrimitiveType = this.setPrimitiveType.bind(this);
+        this.setShouldSaveRegion = this.setShouldSaveRegion.bind(this);
+    }
+
+    setPrimitiveType(type) {
+        this.setState({primitiveType: type});
+    }
+
+    setShouldSaveRegion(save) {
+        this.setState({shouldSaveRegion: save});
     }
 
     componentDidMount() {
@@ -30,8 +45,16 @@ export class Home extends Component {
 
         return (
             <div className="frame-tags">
-                <RegionSelector/>
-                <SelectedRegion selected={['Im an array!']}/>
+                <RegionSelector
+                    shape={this.state.primitiveType}
+                    saveRegion={this.state.shouldSaveRegion}
+                    saveRegionReset={this.setShouldSaveRegion}
+                />
+                <SelectedRegion
+                    selected={['Im an array!']}
+                    handleClick={this.setPrimitiveType}
+                    saveRegionClick={this.setShouldSaveRegion}
+                />
             </div>
 
         );
