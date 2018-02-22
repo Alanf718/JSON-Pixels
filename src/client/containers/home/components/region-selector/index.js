@@ -11,7 +11,9 @@ export class RegionSelector extends Component {
         this.resetRectangle();
         this.regions = {
             list: [],
-            index: 0
+            index: 0,
+            showNodes: false,
+            nodeRadius: 10
         };
         this.shape = 'rect';
     }
@@ -62,6 +64,7 @@ export class RegionSelector extends Component {
             + ', ' + this.regions.list[i].color.b
             + ', ' + this.regions.list[i].color.a
             + ')';
+        this.ctx.lineWidth = 5;
         
         this.ctx.beginPath();
         this.ctx.moveTo(this.regions.list[i].nodes[0].x, this.regions.list[i].nodes[0].y);
@@ -76,13 +79,26 @@ export class RegionSelector extends Component {
         }
     }
 
+    drawNodes(i) {
+        for (let j = 0; j < this.regions.list[i].nodes.length; j++) {
+            this.ctx.beginPath();
+            this.ctx.arc(this.regions.list[i].nodes[j].x, this.regions.list[i].nodes[j].y, this.regions.nodeRadius, 0, 2 * Math.PI, false);
+            this.ctx.fillStyle = '#ffffff';
+            this.ctx.fill();
+            this.ctx.lineWidth = 5;
+            this.ctx.strokeStyle = '#eeeeee';
+            this.ctx.stroke();
+        }
+    }
+
     resetPolygon() {
         this.polygon = {
             type: 'polygon',
             color: this.getRandomColour(),
             nodes: [{x: 0, y: 0}],
             index: 0,
-            closed: false
+            closed: false,
+            selectedNodeIndex: -1
         };
     }
 
@@ -90,41 +106,136 @@ export class RegionSelector extends Component {
         this.rect = {
             type: 'rect',
             color: this.getRandomColour(),
+            nodes: [{x: 0, y: 0},
+                    {x: 0, y: 0},
+                    {x: 0, y: 0},
+                    {x: 0, y: 0}],
             start: {x: 0, y: 0},
-            size: {x: 0, y: 0}
+            size: {x: 0, y: 0},
+            selectedNodeIndex: -1
         };
     }
 
+    draw() {
+        const {canvas} = this;
+        canvas.primitive().clear();
+        
+        for (let i = 0; i < this.regions.list.length; i++)
+        {
+            if(this.regions.list[i].type == 'rect'){
+                this.drawRectangleRegion(i, canvas);
+            } else if (this.regions.list[i].type == 'polygon') {
+                this.drawPolygonRegion(i);
+            }
+
+            if (this.regions.showNodes && i == this.regions.index) {
+                this.drawNodes(i);
+            }
+        }
+    }
+
     saveRegion() {
-        this.regions.index++;
+        if (this.regions.index == this.regions.list.length - 1) {
+            this.regions.index++;
+            this.regions.list.push({});
+        }
         this.resetPolygon();
         this.resetRectangle();
+        this.regions.showNodes = false;
+    }
+
+    offsetLayerIndex(offset) {
+        if ( this.regions.index + offset >= this.regions.list.length ||
+             this.regions.index + offset < 0 
+            ) {
+            return;
+        }
+
+        this.regions.index += offset;
+    }
+
+    toggleNodes() {
+        if (this.regions.list.length <= 0) { return; }
+        if (Object.keys(this.regions.list[this.regions.index]).length === 0) { return; }
+        if (this.regions.list[this.regions.index].type == 'polygon') {
+            if (!this.regions.list[this.regions.index].closed) {
+                return;
+            }
+        }
+        this.regions.showNodes = !this.regions.showNodes;        
     }
 
     onMouseInput(evt) {
         const {pos, type, button} = evt;
-        const {canvas, start} = this;
         const shape = this.shape;
-        canvas.primitive().clear();
         
         switch(shape) {
             case 'rect' : {
                 switch(type) {
                     case 'press' : {
-                        this.resetRectangle();
-                        this.rect.start = pos;
-                        break;
+                        if (!this.regions.showNodes) {
+                            this.resetRectangle();
+                            this.rect.start = pos;
+                        } else {
+                            for (let i = 0; i < this.rect.nodes.length; i++) {
+                                if (Math.sqrt(Math.pow((pos.x - this.rect.nodes[i].x), 2) + Math.pow((pos.y - this.rect.nodes[i].y), 2)) <= this.regions.nodeRadius) {
+                                    this.rect.selectedNodeIndex = i;
+                                }
+                            }
+                        }
+                        
+                        break;                        
                     }
-                    case 'drag'    :
+                    case 'drag' : {
+                        if (this.regions.showNodes) {
+                            const offsetX = this.rect.start.x - pos.x;
+                            const offsetY = this.rect.start.y - pos.y;
+
+                            switch(this.rect.selectedNodeIndex) {
+                                case 0 : {
+                                    this.rect.start.x = pos.x;
+                                    this.rect.start.y = pos.y;
+                                    this.rect.size.x += offsetX;
+                                    this.rect.size.y += offsetY;
+                                    break;
+                                }
+                                case 1 : {
+                                    this.rect.size.x = pos.x - this.rect.start.x;
+                                    this.rect.start.y = pos.y;
+                                    this.rect.size.y += offsetY;
+                                    break;
+                                }
+                                case 2 : {
+                                    this.rect.start.x = pos.x;
+                                    this.rect.size.y = pos.y - this.rect.start.y;
+                                    this.rect.size.x += offsetX;                                    
+                                    break;
+                                }        
+                                case 3 : {
+                                    this.rect.size.x = pos.x - this.rect.start.x;
+                                    this.rect.size.y = pos.y - this.rect.start.y;
+                                    break;
+                                }                      
+                            }
+                            break;
+                        }
+                    }
                     case 'release' : {
-                        this.rect.size = {
-                            x: pos.x - this.rect.start.x,
-                            y: pos.y - this.rect.start.y
-                        };
+                        if (!this.regions.showNodes) {
+                            this.rect.size = {
+                                x: pos.x - this.rect.start.x,
+                                y: pos.y - this.rect.start.y
+                            };
+                        }                        
+                        this.rect.selectedNodeIndex = -1;
                         break;
                     }
                 }
 
+                this.rect.nodes = [{x: this.rect.start.x, y: this.rect.start.y},
+                    {x: this.rect.start.x + this.rect.size.x, y: this.rect.start.y},
+                    {x: this.rect.start.x, y: this.rect.start.y + this.rect.size.y},
+                    {x: this.rect.start.x + this.rect.size.x, y: this.rect.start.y + this.rect.size.y}];
                 this.regions.list[this.regions.index] = this.rect;
                 break;
             }
@@ -133,25 +244,34 @@ export class RegionSelector extends Component {
                     case 'press' : {
                         switch(button) {
                             case 0 : {
-                                if (this.polygon.closed) { break; }
-                                
-                                if (!this.polygon.index > 0) {
-                                    this.polygon.nodes[this.polygon.index].x = pos.x;
-                                    this.polygon.nodes[this.polygon.index].y = pos.y;
-                                    break; 
+                                if (!this.regions.showNodes) {
+                                    if (this.polygon.closed) { break; }
+                                    if (!this.polygon.index > 0) {
+                                        this.polygon.nodes[this.polygon.index].x = pos.x;
+                                        this.polygon.nodes[this.polygon.index].y = pos.y;
+                                        break; 
+                                    }
+    
+                                    this.polygon.nodes.push({x: pos.x, y: pos.y});
+                                } else {
+                                    for (let i = 0; i < this.polygon.nodes.length; i++) {
+                                        if (Math.sqrt(Math.pow((pos.x - this.polygon.nodes[i].x), 2) + Math.pow((pos.y - this.polygon.nodes[i].y), 2)) <= this.regions.nodeRadius) {
+                                            this.polygon.selectedNodeIndex = i;
+                                        }
+                                    }
                                 }
-
-                                this.polygon.nodes.push({x: pos.x, y: pos.y});
                                 break;
                             }
                             case 1 :
                             case 2 : {
-                                if ( this.polygon.index > 0 && !this.polygon.closed) {
-                                    this.polygon.closed = true;
-                                } else {
-                                    this.polygon.closed = false;
-                                    this.polygon.nodes = [{x:0, y:0}];
-                                    this.polygon.index = 0;
+                                if (!this.regions.showNodes) {
+                                    if ( this.polygon.index > 0 && !this.polygon.closed) {
+                                        this.polygon.closed = true;
+                                    } else {
+                                        this.polygon.closed = false;
+                                        this.polygon.nodes = [{x:0, y:0}];
+                                        this.polygon.index = 0;
+                                    }
                                 }
                                 break;
                             }
@@ -159,18 +279,28 @@ export class RegionSelector extends Component {
                         break;
                     }
                     case 'drag' : {
-                        if (this.polygon.closed) { break; }
-                        
-                        this.polygon.nodes[this.polygon.index].x = pos.x;
-                        this.polygon.nodes[this.polygon.index].y = pos.y;
+                        if (!this.regions.showNodes) {
+                            if (this.polygon.closed) { break; }
+                            
+                            this.polygon.nodes[this.polygon.index].x = pos.x;
+                            this.polygon.nodes[this.polygon.index].y = pos.y;
+                            break;
+                        } else {
+                            if (this.polygon.selectedNodeIndex < 0 || this.polygon.selectedNodeIndex >= this.polygon.nodes.length) { break; }
+                            this.polygon.nodes[this.polygon.selectedNodeIndex].x = pos.x;
+                            this.polygon.nodes[this.polygon.selectedNodeIndex].y = pos.y;
+                        }
                         break;
                     }
-                    case 'release' : {          
-                        if (this.polygon.closed) { break; }
-                        
-                        if ( button === 0 ) {
-                            this.polygon.index++;
-                        }                 
+                    case 'release' : {
+                        this.polygon.selectedNodeIndex = -1;      
+                        if (!this.regions.showNodes) {                    
+                            if (this.polygon.closed) { break; }
+                            
+                            if ( button === 0 ) {
+                                this.polygon.index++;
+                            }
+                        }
                         break;
                     }
                 }
@@ -180,14 +310,7 @@ export class RegionSelector extends Component {
             }
         }
 
-        for (let i = 0; i <= this.regions.index; i++)
-        {
-            if(this.regions.list[i].type == 'rect'){
-                this.drawRectangleRegion(i, canvas);
-            } else if (this.regions.list[i].type == 'polygon') {
-                this.drawPolygonRegion(i);
-            }
-        }
+        this.draw();
     }
 
     contextMenu(e) {
@@ -203,7 +326,27 @@ export class RegionSelector extends Component {
         if (nextProps.saveRegion) {
             this.saveRegion();
             nextProps.saveRegionReset(false);
+            nextProps.setLayers(this.regions.list.length, this.regions.index);            
         }
+
+        if (nextProps.prevLayer) {
+            this.offsetLayerIndex(-1);
+            nextProps.prevLayerReset(false);
+            nextProps.setLayers(this.regions.list.length, this.regions.index);   
+        }
+
+        if (nextProps.nextLayer) {
+            this.offsetLayerIndex(1);            
+            nextProps.nextLayerReset(false);
+            nextProps.setLayers(this.regions.list.length, this.regions.index);   
+        }
+
+        if (nextProps.toggleNodes) {
+            this.toggleNodes();
+            nextProps.toggleNodesReset(false);
+        }
+
+        this.draw();        
     }
 
     // called on first render
@@ -211,7 +354,6 @@ export class RegionSelector extends Component {
         const domElement = document.querySelector('.display');
         const cql = CanvasQL('.display canvas');
         cql.primitive().clear();
-        cql.primitive().rect().at(10, 20).size(32, 32).go();
 
         this.canvas = cql;
         this.ctx = document.querySelector('.display canvas').getContext("2d");

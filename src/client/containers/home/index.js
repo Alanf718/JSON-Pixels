@@ -23,10 +23,19 @@ export class Home extends Component {
         super(props);
         this.state = {
             primitiveType: 'rect',
-            shouldSaveRegion: false
+            shouldSaveRegion: false,
+            prevLayer: false,
+            nextLayer: false,
+            numberOfLayers: 1,
+            layerIndex: 0,
+            toggleNodes: false
         };
         this.setPrimitiveType = this.setPrimitiveType.bind(this);
         this.setShouldSaveRegion = this.setShouldSaveRegion.bind(this);
+        this.setLayers = this.setLayers.bind(this);
+        this.prevLayer = this.prevLayer.bind(this);
+        this.nextLayer = this.nextLayer.bind(this);
+        this.toggleNodes = this.toggleNodes.bind(this);
     }
 
     setPrimitiveType(type) {
@@ -37,7 +46,20 @@ export class Home extends Component {
         this.setState({shouldSaveRegion: save});
     }
 
-    componentDidMount() {
+    setLayers(layers, index) {
+        this.setState({numberOfLayers: layers, layerIndex: index});
+    }
+
+    prevLayer(set) {
+        this.setState({prevLayer: set});
+    }
+
+    nextLayer(set) {
+        this.setState({nextLayer: set});
+    }
+
+    toggleNodes(set) {
+        this.setState({toggleNodes: set});
     }
 
     render() {
@@ -49,11 +71,22 @@ export class Home extends Component {
                     shape={this.state.primitiveType}
                     saveRegion={this.state.shouldSaveRegion}
                     saveRegionReset={this.setShouldSaveRegion}
+                    setLayers={this.setLayers}
+                    prevLayer={this.state.prevLayer}
+                    prevLayerReset={this.prevLayer}
+                    nextLayer={this.state.nextLayer}
+                    nextLayerReset={this.nextLayer}
+                    toggleNodes={this.state.toggleNodes}
+                    toggleNodesReset={this.toggleNodes}
                 />
                 <SelectedRegion
-                    selected={['Im an array!']}
+                    numberOfLayers={this.state.numberOfLayers}
+                    layerIndex={this.state.layerIndex}
                     handleClick={this.setPrimitiveType}
                     saveRegionClick={this.setShouldSaveRegion}
+                    prevLayerClick={this.prevLayer}
+                    nextLayerClick={this.nextLayer}
+                    toggleNodesClick={this.toggleNodes}
                 />
             </div>
 
