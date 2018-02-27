@@ -63,22 +63,30 @@ export class Home extends Component {
     }
 
     render() {
-        // const {debug1} = this.props;
+        const {regionMode, config} = this.props;
 
         return (
             <div className="frame-tags">
-                <RegionSelector
-                    shape={this.state.primitiveType}
-                    saveRegion={this.state.shouldSaveRegion}
-                    saveRegionReset={this.setShouldSaveRegion}
-                    setLayers={this.setLayers}
-                    prevLayer={this.state.prevLayer}
-                    prevLayerReset={this.prevLayer}
-                    nextLayer={this.state.nextLayer}
-                    nextLayerReset={this.nextLayer}
-                    toggleNodes={this.state.toggleNodes}
-                    toggleNodesReset={this.toggleNodes}
-                />
+                <div>
+                    <RegionSelector
+                        shape={this.state.primitiveType}
+                        saveRegion={this.state.shouldSaveRegion}
+                        saveRegionReset={this.setShouldSaveRegion}
+                        setLayers={this.setLayers}
+                        prevLayer={this.state.prevLayer}
+                        prevLayerReset={this.prevLayer}
+                        nextLayer={this.state.nextLayer}
+                        nextLayerReset={this.nextLayer}
+                        toggleNodes={this.state.toggleNodes}
+                        toggleNodesReset={this.toggleNodes}
+                    />
+                    <button onClick={() => regionMode({mode: 'rectangle'})}>Rectangle</button>
+                    <button onClick={() => regionMode({mode: 'polygon'})}>Polygon</button>
+
+                    <pre id="debug">
+                        {JSON.stringify(config)}
+                    </pre>
+                </div>
                 <SelectedRegion
                     numberOfLayers={this.state.numberOfLayers}
                     layerIndex={this.state.layerIndex}
@@ -94,9 +102,7 @@ export class Home extends Component {
     }
 }
 
-const mapStateToProps = (state) => {
-    return { view: state };
-};
+const mapStateToProps = (state) => state;
 
 const mapDispatchToProps = (dispatch) => (bindActionCreators({...ActionCreators}, dispatch));
 

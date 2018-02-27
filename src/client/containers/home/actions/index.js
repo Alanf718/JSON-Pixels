@@ -1,8 +1,13 @@
 export const ActionCreators = {
-    debug1: () => {
+    /**
+     * Set the region tool to either rectangle or polygon mode
+     * @param {string} mode [rectangle|polygon]
+     * @returns {{type: string, payload: [number]}} action
+     */
+    regionMode: ({mode}) => {
         return {
-            type: 'DEBUG1',
-            payload: [0]
+            type: 'REGION-MODE',
+            payload: mode
         };
     }
 };

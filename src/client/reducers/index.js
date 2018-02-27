@@ -1,16 +1,10 @@
 import {combineReducers} from 'redux';
-
-export const example = (state = {}, {type} = {}) => {
-    switch (type) {
-    case 'DEBUG1':
-        return {loggedIn: false, view: ''};
-    default:
-        return state;
-    }
-};
+import {config} from './config';
+import {regions} from './regions';
 
 const rootReducer = combineReducers({
-    example: example
+    config: config,
+    regions: regions
 });
 
 export default rootReducer;

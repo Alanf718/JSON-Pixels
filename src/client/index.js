@@ -1,12 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {Provider} from 'react-redux';
-import {createStore, combineReducers, applyMiddleware} from 'redux';
+import {createStore, applyMiddleware} from 'redux';
 
 import reducers from './reducers';
 // import { Router, Route, browserHistory } from 'react-router';
 // import { Route } from 'react-router-dom';
-import { routerReducer, routerMiddleware, ConnectedRouter } from 'react-router-redux';
+import { routerMiddleware, ConnectedRouter } from 'react-router-redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import createHistory from 'history/createBrowserHistory';
 
@@ -18,7 +18,8 @@ const middleware = routerMiddleware(history);
 const composeEnhancers = composeWithDevTools({});
 
 const store = createStore(
-    combineReducers({...reducers, routing: routerReducer}),
+    // combineReducers({...reducers, routing: routerReducer}),
+    reducers,
     composeEnhancers(applyMiddleware(middleware))
 );
 

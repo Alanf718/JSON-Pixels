@@ -507,7 +507,7 @@ export class RegionSelector extends Component {
         this.mouseSubscription.unsubscribe();
     }
 
-    render() {        
+    render() {
         return (
             <div className="display">
                 <canvas width="640" height="480" onContextMenu={this.contextMenu}/>
