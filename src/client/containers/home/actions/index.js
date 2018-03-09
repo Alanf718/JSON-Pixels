@@ -1,5 +1,7 @@
 import { ACTION_REGION_MODE, ACTION_ADD_REGION, ACTION_REMOVE_REGION, ACTION_TOGGLE_NODES,
-    ACTION_SAVE_REGION, ACTION_TOGGLE_SAVE_REGION } from './action-types';
+    ACTION_SAVE_REGION, ACTION_TOGGLE_SAVE_REGION, ACTION_UPDATE_SELECTED_REGION,
+    ACTION_RESET_REGION } from './action-types';
+import { REGION_MODE_RECTANGLE } from '../enums/region-modes';
 
 import('./action-types/index.js');
 
@@ -20,14 +22,14 @@ export const ActionCreators = {
      * Adds a new region of the currently selected type to the
      * list of created regions with either default values or
      * with a specified region object.
-     * @param {string} mode [REGION_MODE_ENUM]
+     * @param {string} [mode=REGION_MODE_RECTANGLE] [REGION_MODE_ENUM]
      * @param {Object} [region=null] The region to add.
      * @returns {{type: string, payload: {mode: string, region: Object}}} action
      */
-    addRegion: ({mode}) => {
+    addRegion: ({mode = REGION_MODE_RECTANGLE, region = null}) => {
         return {
             type: ACTION_ADD_REGION,
-            payload: mode//{mode: mode, region: region}
+            payload: {mode: mode, region: region}
         };
     },
 
@@ -41,6 +43,20 @@ export const ActionCreators = {
         return {
             type: ACTION_REMOVE_REGION,
             payload: index
+        };
+    },
+
+    /**
+     * Resets the parameters of a region to their defaults.
+     * @param {string} [mode=REGION_MODE_RECTANGLE] [REGION_MODE_ENUM]
+     * @param {number} [index=-1] Index to reset. If empty
+     * will use the current selected region.
+     * @returns {{type: string, payload: number}} action
+     */
+    resetRegion: ({mode = REGION_MODE_RECTANGLE, index = -1}) => {
+        return {
+            type: ACTION_RESET_REGION,
+            payload: {mode: mode, index: index}
         };
     },
 
@@ -67,6 +83,19 @@ export const ActionCreators = {
         return {
             type: ACTION_SAVE_REGION,
             payload: region
+        };
+    },
+
+    /**
+     * Updates the currently selected region to the
+     * specified index.
+     * @param {number} index [n]
+     * @returns {{type: string, payload: number}} action
+     */
+    updateSelectedRegion: ({index}) => {
+        return {
+            type: ACTION_UPDATE_SELECTED_REGION,
+            payload: index
         };
     },
 

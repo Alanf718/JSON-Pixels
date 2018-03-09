@@ -1,8 +1,8 @@
-import defaultConfig from './config';
+import config from './config';
 import { TOGGLE_NODES } from '../../containers/home/actions/action-types';
 
 const defaultLayers = {
-    config: Object.assign({}, defaultConfig),
+    config: config(),
     list: []
 };
 

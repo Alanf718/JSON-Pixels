@@ -1,12 +1,14 @@
-import { getRandomColour } from '../../../containers/home/utilities';
-import defaultClosestNode from './nodes/closest-node';
+import { getRandomColour } from '../../../containers/home/functions/utilities';
+import closestNode from './nodes/closest-node';
 
-const baseRegion = {
-    layer: -1,
-    color: getRandomColour(),
-    selectedNodeIndex: 1,
-    closestNode: Object.assign({}, defaultClosestNode),
-    saved: false
+const baseRegion = () => {
+    return {
+        layer: -1,
+        color: getRandomColour(),
+        selectedNodeIndex: 0,
+        closestNode: closestNode(),
+        saved: false
+    };
 };
 
 export default baseRegion;

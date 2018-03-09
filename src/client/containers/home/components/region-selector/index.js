@@ -13,6 +13,8 @@ import { onRectangleRelease, onRectangleDrag, onRectangleLeftClick } from '../..
 import { REGION_TYPE_POLYGON, REGION_TYPE_RECTANGLE } from '../../enums/region-types';
 import { NODE_STROKE_COLOUR, NODE_STROKE_THICKNESS, NODE_FILL_COLOUR, NODE_RADIUS }
     from '../../../../reducers/regions/default-region/nodes/node';
+import { drawRectangleRegion } from '../../functions/rectangle-region/draw';
+import { drawPolygonRegion } from '../../functions/polygon-region/draw';
 
 export class RegionSelector extends Component {
 
@@ -29,66 +31,26 @@ export class RegionSelector extends Component {
 
     /* eslint-disable */
 
-    /*
-    **    Region resets
-    */
+    /**
+     * Resets the temporary region to it's initial
+     * state, based on the region mode.
+     */
     assignTempRegion() {
         switch(this.regionMode) {
             case REGION_MODE_RECTANGLE:
-                this.tempRegion = Object.assign({}, baseRegion, rectangleRegion);
+                this.tempRegion = Object.assign({}, baseRegion(), rectangleRegion());
                 break;
             case REGION_MODE_POLYGON:
-                this.tempRegion = Object.assign({}, baseRegion, polygonRegion);
+                this.tempRegion = Object.assign({}, baseRegion(), polygonRegion());
                 break;
         }
-    }
+    }    
 
-    /*
-    **    Region drawing
-    */
-    drawRectangleRegion(region, canvas) {
-        canvas
-            .primitive()
-            .rect()
-            .color('rgba('
-                + region.color.r
-                + ', ' + region.color.g
-                + ', ' + region.color.b
-                + ', ' + region.color.a
-                + ')')
-            .at(region.nodes[0].x, region.nodes[0].x)
-            .size(region.width, region.height)
-            .go();
-    }
-
-    drawPolygonRegion(region) {
-        this.ctx.fillStyle = 'rgba('
-            + region.color.r
-            + ', ' + region.color.g
-            + ', ' + region.color.b
-            + ', ' + region.color.a
-            + ')';
-        this.ctx.strokeStyle = 'rgba('
-            + region.color.r
-            + ', ' + region.color.g
-            + ', ' + region.color.b
-            + ', ' + region.color.a
-            + ')';
-        this.ctx.lineWidth = 5;
-        
-        this.ctx.beginPath();
-        this.ctx.moveTo(region.nodes[0].x, region.nodes[0].y);
-        for (let j = 1; j < region.nodes.length; j++) {
-            this.ctx.lineTo(region.nodes[j].x,region.nodes[j].y);
-        }
-        if (region.closed) {
-            this.ctx.closePath();
-            this.ctx.fill();
-        } else {
-            this.ctx.stroke();
-        }
-    }
-
+    /**
+     * Draws the nodes of the passed in region.
+     * @param {Object} region The region to draw nodes
+     * for.
+     */
     drawNodes(region) {
         for (let i = 0; i < region.nodes.length; i++) {
             this.ctx.beginPath();
@@ -101,69 +63,73 @@ export class RegionSelector extends Component {
         }
     }
 
-    drawFilter(region, canvas, i) {
+    /**
+     * A filtered version of the original draw function
+     * which passes the region to the correct drawing
+     * function depending on it's type.
+     * @param {Object} region The region to pass through.
+     * @param {Object} canvas The canvas to draw to.
+     */
+    drawFilter(region, canvas) {
         if(region.type === REGION_TYPE_RECTANGLE){
-            this.drawRectangleRegion(region, canvas);
+            drawRectangleRegion(region, canvas);
         } else if (region.type === REGION_TYPE_POLYGON) {
-            this.drawPolygonRegion(region);
-        }
-
-        if (this.showNodes && i == this.regions.config.selectedRegion) {
-            this.drawNodes(region);
+            drawPolygonRegion(region, this.ctx);
         }
     }
 
+    /**
+     * Draws all entities, both saved and temporary
+     * where appropriae, to the canvas.
+     */
     draw() {
         const {canvas} = this;
         canvas.primitive().clear();
-
         for (let i = 0; i < this.regions.list.length; i++)
         {
-            if (!this.regions.list[i].saved) {
-                this.drawFilter(this.tempRegion, canvas, i);
+            if (this.showNodes && i == this.regions.config.selectedRegion) {
+                this.drawFilter(this.tempRegion, canvas);
+                this.drawNodes(this.tempRegion);
+            } else if (!this.regions.list[i].saved) {
+                this.drawFilter(this.tempRegion, canvas);
             } else {
-                this.drawFilter(this.regions.list[i], canvas, i);
-            }            
+                this.drawFilter(this.regions.list[i], canvas);
+            }        
         }
     }
 
-    /*
-    **    Region manipulation
-    */
-
-    //Change the currently selected layer by a specified value and 
-    //retrieve the correctly defined region
-    offsetLayerIndex(offset) {
-        if ( this.regions.index + offset >= this.regions.list.length ||
-             this.regions.index + offset < 0 
-            ) {
-            return;
-        }
-
-        this.regions.index += offset;
-        if (this.regions.list[this.regions.index].type == 'rect') {
-            this.rect = this.regions.list[this.regions.index];
-        } else if (this.regions.list[this.regions.index].type == 'polygon') {
-            this.polygon = this.regions.list[this.regions.index];
-        }
-    }
-
-    //Toggle whether or not nodes are currently being shown for the selected region
+    /**
+     * Checks a number of properties and returns 
+     * if showing and modifying nodes is currently
+     * allowed for this region.
+     * @returns {boolean} Whether showing nodes is 
+     * currently a valid option.
+     */
     tryToggleNodes() {
         if (this.regions.list.length <= 0) { return false; }
+        if(this.regions.config.selectedRegion < 0 || 
+            this.regions.config.selectedRegion >= this.regions.list.length) {
+            return false;
+        }
         if (Object.keys(this.regions.list[this.regions.config.selectedRegion]).length === 0) { return false; }
         if (this.regions.list[this.regions.config.selectedRegion].type === REGION_TYPE_POLYGON) {
             if (!this.regions.list[this.regions.config.selectedRegion].closed) {
                 return false;
             }
         }
+
         return true;
     }
 
-    /*
-    **    Rect input methods
-    */
-
+   /**
+     * Delegates properties from a mouse input
+     * event to the correct rectangle region
+     * functions based on the type of input event
+     * and button pressed.
+     * @param {Object} pos Mouse position.
+     * @param {string} type Type of input event. 
+     * [MOUSE_INPUT_ENUM]
+     */
     onRectInput(pos, type) {
         //Call correct methods based on input type
         switch(type) {
@@ -177,15 +143,22 @@ export class RegionSelector extends Component {
             }
             case MOUSE_INPUT_RELEASE : {
                 this.tempRegion = onRectangleRelease(this.tempRegion, this.saveRegion);
-                this.addRegion({mode:this.regionMode});      
                 break;
             }
         }
     }
 
-    /*
-    **    Polygon input methods
-    */
+    /**
+     * Delegates properties from a mouse input
+     * event to the correct polygon region
+     * functions based on the type of input event
+     * and button pressed.
+     * @param {Object} pos Mouse position.
+     * @param {string} type Type of input event. 
+     * [MOUSE_INPUT_ENUM]
+     * @param {Object} button The mouse button for 
+     * the event. [MOUSE_BUTTON_ENUM]
+     */
     onPolygonInput(pos, type, button) {
         switch(type) {
             case MOUSE_INPUT_PRESS : {
@@ -196,12 +169,7 @@ export class RegionSelector extends Component {
                     }
                     case MOUSE_BUTTON_MIDDLE :
                     case MOUSE_BUTTON_RIGHT : {
-                        const rClickObj = onPolygonRightClick(this.tempRegion, this.showNodes, pos);
-                        this.tempRegion = rClickObj.polygon;
-                        if (rClickObj.add) {
-                            this.addRegion({mode: regionMode, region: this.tempRegion});
-                            this.assignTempRegion();
-                        }
+                        this.tempRegion = onPolygonRightClick(this.tempRegion, this.showNodes, pos, this.resetRegion, this.saveRegion);
                         break;
                     }
                 }
@@ -217,15 +185,18 @@ export class RegionSelector extends Component {
             }
         }
     }
-    
-    /*
-    **    Input checks
-    */
+
+    /**
+     * Delegates properties from a mouse input
+     * event to the correct functions based
+     * on the region mode and then redraws the 
+     * canvas.
+     * @param {Object} evt Mouse event.
+     */
     onMouseInput(evt) {
         const {pos, type, button} = evt;
-        const regionMode = this.regionMode;
 
-        switch(regionMode) {
+        switch(this.regionMode) {
             case REGION_MODE_RECTANGLE : {
                 this.onRectInput(pos, type);            
                 break;
@@ -244,10 +215,11 @@ export class RegionSelector extends Component {
     }
 
     componentWillUpdate(nextProps, nextState) {
-        const {regionMode, saveRegion, saveRegionAction, 
+        const {regionMode, regions, saveRegion, saveRegionAction, 
             toggleSaveRegion, toggleNodes, showNodes} = nextProps;
 
         if (this.regionMode != regionMode) {
+            this.regionMode = regionMode;
             this.assignTempRegion ();
         }
 
@@ -261,9 +233,13 @@ export class RegionSelector extends Component {
         if (showNodes) {
             if (this.tryToggleNodes()) {
                 this.showNodes = showNodes;
+                this.tempRegion = regions.list[regions.config.selectedRegion];
             } else {
                 toggleNodes({state: false});
             }
+        } else if (showNodes != this.showNodes){
+            this.showNodes = showNodes;
+            this.assignTempRegion();
         }
 
         this.draw();        
@@ -293,14 +269,16 @@ export class RegionSelector extends Component {
 
     render() {
         const {regionMode, regions, layerConfig, toggleNodes, addRegion, removeRegion, saveRegion,
-            saveRegionAction} = this.props;
+            saveRegionAction, updateSelectedRegion, resetRegion} = this.props;
         this.regionMode = regionMode;
         this.regions = regions;
         this.layerConfig = layerConfig;
         this.toggleNodes = toggleNodes;
         this.addRegion = addRegion;
         this.removeRegion = removeRegion;
+        this.resetRegion = resetRegion;
         this.saveRegion = saveRegionAction;
+        this.updateSelectedRegion = updateSelectedRegion;
 
         return (
             <div className="display">

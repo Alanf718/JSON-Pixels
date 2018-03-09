@@ -1,5 +1,7 @@
-const layer = {
-    showNodes: false
+const layer = () => {
+    return {
+        showNodes: false
+    };
 };
 
 export default layer;
