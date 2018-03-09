@@ -6,6 +6,8 @@ import {RegionSelector} from './components/region-selector';
 import {SelectedRegion} from './components/selected-region';
 
 import './style.scss';
+import { REGION_MODE_RECTANGLE, REGION_MODE_POLYGON } from './enums/region-modes';
+
 /* eslint-disable no-unused-vars */
 const selected = {
     regionSelected: [
@@ -63,38 +65,41 @@ export class Home extends Component {
     }
 
     render() {
-        const {regionMode, config} = this.props;
+        const {regionMode, config, toggleNodes, toggleSaveRegion, regions,
+            layers, addRegion, removeRegion, saveRegion} = this.props;
+        //Validity check for selected region
+        const toggleNodesState =
+            (regions.config.selectedRegion > 0 && regions.config.selectedRegion < regions.list.length)
+                ? regions.list[regions.config.selectedRegion].showNodes
+                : false;
 
         return (
             <div className="frame-tags">
                 <div>
                     <RegionSelector
-                        shape={this.state.primitiveType}
-                        saveRegion={this.state.shouldSaveRegion}
-                        saveRegionReset={this.setShouldSaveRegion}
-                        setLayers={this.setLayers}
-                        prevLayer={this.state.prevLayer}
-                        prevLayerReset={this.prevLayer}
-                        nextLayer={this.state.nextLayer}
-                        nextLayerReset={this.nextLayer}
-                        toggleNodes={this.state.toggleNodes}
-                        toggleNodesReset={this.toggleNodes}
+                        regionMode={config.regionMode}
+                        saveRegion={config.saveRegion}
+                        saveRegionAction={saveRegion}
+                        toggleSaveRegion={toggleSaveRegion}
+                        toggleNodes={toggleNodes}
+                        showNodes={toggleNodesState}
+                        regions={regions}
+                        layerConfig={layers.config}
+                        addRegion={addRegion}
+                        removeRegion={removeRegion}
                     />
-                    <button onClick={() => regionMode({mode: 'rectangle'})}>Rectangle</button>
-                    <button onClick={() => regionMode({mode: 'polygon'})}>Polygon</button>
+                    <button onClick={() => regionMode({mode: REGION_MODE_RECTANGLE})}>Rectangle</button>
+                    <button onClick={() => regionMode({mode: REGION_MODE_POLYGON})}>Polygon</button>
 
                     <pre id="debug">
                         {JSON.stringify(config)}
                     </pre>
                 </div>
                 <SelectedRegion
-                    numberOfLayers={this.state.numberOfLayers}
-                    layerIndex={this.state.layerIndex}
-                    handleClick={this.setPrimitiveType}
-                    saveRegionClick={this.setShouldSaveRegion}
-                    prevLayerClick={this.prevLayer}
-                    nextLayerClick={this.nextLayer}
-                    toggleNodesClick={this.toggleNodes}
+                    toggleSaveRegion={toggleSaveRegion}
+                    toggleSaveRegionState={!config.saveRegion}
+                    toggleNodes={toggleNodes}
+                    toggleNodesState={!toggleNodesState}
                 />
             </div>
 

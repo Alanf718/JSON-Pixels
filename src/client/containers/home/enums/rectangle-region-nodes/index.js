@@ -1,0 +1,4 @@
+export const RECT_NODE_TOPLEFT_CORNER = 0;
+export const RECT_NODE_TOPRIGHT_CORNER = 1;
+export const RECT_NODE_BOTTOMLEFT_CORNER = 2;
+export const RECT_NODE_BOTTOMRIGHT_CORNER = 3;
