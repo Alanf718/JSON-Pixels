@@ -1,14 +1,31 @@
-import { getRandomColour } from '../../../containers/home/functions/utilities';
+import { getRandomColour, generateID } from '../../../containers/home/functions/utilities';
 import closestNode from './nodes/closest-node';
 
-const baseRegion = () => {
+export const baseRegionNonResettable = () => {
+    const id = generateID();
     return {
         layer: -1,
-        color: getRandomColour(),
+        id: id,
+        name: 'region_' + id,
+        visible: true,
+        color: getRandomColour()
+    };
+};
+
+export const baseRegionResettable = () => {
+    return {
         selectedNodeIndex: 0,
         closestNode: closestNode(),
         saved: false
     };
 };
 
-export default baseRegion;
+export const resetBaseRegion = (region) => {
+    return Object.assign(region, baseRegionResettable());
+};
+
+const createBaseRegion = () => {
+    return Object.assign({}, baseRegionNonResettable(), baseRegionResettable());
+};
+
+export default createBaseRegion;

@@ -1,9 +1,11 @@
 import { NODE_RADIUS, NODE_STROKE_THICKNESS } from '../../../../../reducers/regions/default-region/nodes/node';
 import { RECT_NODE_TOPLEFT_CORNER, RECT_NODE_TOPRIGHT_CORNER, RECT_NODE_BOTTOMLEFT_CORNER,
-    RECT_NODE_BOTTOMRIGHT_CORNER } from '../../../enums/rectangle-region-nodes';
-import { defaultRectangle, defaultPos } from '../../defaults';
-import { REGION_MODE_RECTANGLE } from '../../../enums/region-modes';
+    RECT_NODE_BOTTOMRIGHT_CORNER } from '../../../constants';
+import { defaultPos } from '../../defaults';
+import { REGION_MODE_RECTANGLE } from '../../../actions';
 import { getPointWithinRadiusOfPoint } from '../../utilities';
+import createRectangleRegion, { resetRectangleRegion }
+    from '../../../../../reducers/regions/default-region/rect-region';
 
 /*eslint-disable*/
 /**
@@ -11,19 +13,19 @@ import { getPointWithinRadiusOfPoint } from '../../utilities';
  * Sets the rectangle start point and adds a new region to the state.
  * If nodes are manipulatable, checks if the click intersects a node
  * and selects it.
- * @param {Object} [rect=defaultRectangle()] Rectangle to handle input for.
+ * @param {Object} [rect=createRectangleRegion()] Rectangle to handle input for.
  * @param {boolean} [showNodes=false] Are nodes currently being shown?
  * @param {Object} [pos=defaultPos()] Position to add node to or check.
  * @param {function} [action=null] Add Region action.
  * @returns {Object} Modified rectangle.
  */
-export const onRectangleLeftClick = (rect = defaultRectangle(), showNodes = false, pos = defaultPos(), action = null) => {
+export const onRectangleLeftClick = (rect = createRectangleRegion(), showNodes = false, pos = defaultPos(), action = null) => {
     //Start drawing a new rectangle if nodes aren't turned on
     if (!showNodes) {
         if (action !== null) {
             action({mode: REGION_MODE_RECTANGLE, region: rect});            
         }
-        rect = defaultRectangle();
+        rect = resetRectangleRegion(rect);
         rect.nodes[0] = pos;
     } else {
         //If nodes are being turned on, check if the click was within the bounds of one of the nodes 
@@ -40,15 +42,36 @@ export const onRectangleLeftClick = (rect = defaultRectangle(), showNodes = fals
 };
 
 /**
+ * Handles right click input for a rectangle region.
+ * Resets the rectangle object both in the state 
+ * and locally if it isn't being modified.
+ * @param {Object} [rect=createRectangleRegion()] Rectangle to handle input for.
+ * @param {boolean} [showNodes=false] Are nodes currently being shown?
+ * @param {function} [action=null] Reset Region action.
+ * @returns {Object} Modified rectangle.
+ */
+export const onRectangleRightClick = (rect = createRectangleRegion(), showNodes = false,  action = null) => {
+    //Start drawing a new rectangle if nodes aren't turned on
+    if (!showNodes) {
+        if (action !== null) {
+            action({mode: REGION_MODE_RECTANGLE});            
+        }
+        rect = resetRectangleRegion(rect);
+    }
+    
+    return rect;
+};
+
+/**
  * Handles dragging input for a rectangle region.
  * Updates selected node position if possible, otherwise changes
  * the initial size of the rectangle.
- * @param {Object} [rect=defaultRectangle()] Rectangle to handle input for.
+ * @param {Object} [rect=createRectangleRegion()] Rectangle to handle input for.
  * @param {boolean} [showNodes=false] Are nodes currently being shown?
  * @param {Object} [pos=defaultPos()] Position to update nodes with.
  * @returns {Object} Modified rectangle.
  */
-export const onRectangleDrag = (rect = defaultRectangle(), showNodes = false, pos = defaultPos()) => {
+export const onRectangleDrag = (rect = createRectangleRegion(), showNodes = false, pos = defaultPos()) => {
     if (showNodes) {
         const offsetX = rect.nodes[0].x - pos.x;
         const offsetY = rect.nodes[0].y - pos.y;
@@ -97,11 +120,11 @@ export const onRectangleDrag = (rect = defaultRectangle(), showNodes = false, po
 /**
  * Handles input release for a rectangle region.
  * Modifies the selected node index and saves the region.
- * @param {Object} [rect=defaultRectangle()] Rectangle to handle input for.
+ * @param {Object} [rect=createRectangleRegion()] Rectangle to handle input for.
  * @param {function} [action=null] Save Region action.
  * @returns {Object} Modified rectangle.
  */
-export const onRectangleRelease = (rect = defaultRectangle(), action = null) => {
+export const onRectangleRelease = (rect = createRectangleRegion(), action = null) => {
     //Reset the selected node.
     rect.selectedNodeIndex = -1;
     if (action !== null ) {

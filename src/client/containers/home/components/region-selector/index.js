@@ -1,35 +1,37 @@
 import React, {Component} from 'react';
 import {mouse, CanvasQL} from 'gocanvas';
 import './style.scss';
-import { REGION_MODE_RECTANGLE, REGION_MODE_POLYGON } from '../../enums/region-modes';
-import baseRegion from '../../../../reducers/regions/default-region';
-import rectangleRegion from '../../../../reducers/regions/default-region/rect-region';
-import polygonRegion from '../../../../reducers/regions/default-region/polygon-region';
-import { MOUSE_INPUT_PRESS, MOUSE_INPUT_DRAG, MOUSE_INPUT_RELEASE } from '../../enums/mouse-input-types';
-import { MOUSE_BUTTON_LEFT, MOUSE_BUTTON_MIDDLE, MOUSE_BUTTON_RIGHT } from '../../enums/mouse-buttons';
+import { resetRectangleRegion } from '../../../../reducers/regions/default-region/rect-region';
+import { resetPolygonRegion } from '../../../../reducers/regions/default-region/polygon-region';
 import { onPolygonRelease, onPolygonDrag, onPolygonRightClick, onPolygonLeftClick }
     from '../../functions/polygon-region/input';
-import { onRectangleRelease, onRectangleDrag, onRectangleLeftClick } from '../../functions/rectangle-region/input';
-import { REGION_TYPE_POLYGON, REGION_TYPE_RECTANGLE } from '../../enums/region-types';
+import { onRectangleRelease, onRectangleDrag, onRectangleLeftClick, onRectangleRightClick }
+    from '../../functions/rectangle-region/input';
 import { NODE_STROKE_COLOUR, NODE_STROKE_THICKNESS, NODE_FILL_COLOUR, NODE_RADIUS }
     from '../../../../reducers/regions/default-region/nodes/node';
 import { drawRectangleRegion } from '../../functions/rectangle-region/draw';
 import { drawPolygonRegion } from '../../functions/polygon-region/draw';
+import { REGION_MODE_RECTANGLE, REGION_MODE_POLYGON } from '../../actions';
+import { REGION_TYPE_RECTANGLE, REGION_TYPE_POLYGON, MOUSE_INPUT_PRESS, MOUSE_INPUT_DRAG,
+    MOUSE_INPUT_RELEASE, MOUSE_BUTTON_LEFT, MOUSE_BUTTON_MIDDLE, MOUSE_BUTTON_RIGHT } from '../../constants';
+import createRectangleRegion from '../../../../reducers/regions/default-region/rect-region';
+import createPolygonRegion from '../../../../reducers/regions/default-region/polygon-region';
 
 export class RegionSelector extends Component {
 
+    /* eslint-disable */    
     constructor(props) {
         super(props);
-        const {regionMode, regions, showNodes, addRegion} = this.props;
+        const {regionMode, regionList, regionConfig, showNodes, addRegion} = this.props;
         this.tempRegion = null;
         this.regionMode = regionMode;
-        this.regions = regions;
+        this.regionList = regionList;
+        this.regionConfig = {...regionConfig};
         this.showNodes = showNodes;
-        this.assignTempRegion();
         addRegion({mode: regionMode});
+        this.tempRegion = regionList[regionConfig.selectedRegion];
     }
 
-    /* eslint-disable */
 
     /**
      * Resets the temporary region to it's initial
@@ -38,10 +40,22 @@ export class RegionSelector extends Component {
     assignTempRegion() {
         switch(this.regionMode) {
             case REGION_MODE_RECTANGLE:
-                this.tempRegion = Object.assign({}, baseRegion(), rectangleRegion());
+                if (this.tempRegion === null) {
+                    this.tempRegion = createRectangleRegion();
+                }
+                if (this.tempRegion.type != REGION_TYPE_RECTANGLE) {
+                    this.tempRegion = createRectangleRegion();
+                }
+                this.tempRegion = resetRectangleRegion(this.tempRegion);
                 break;
             case REGION_MODE_POLYGON:
-                this.tempRegion = Object.assign({}, baseRegion(), polygonRegion());
+                if (this.tempRegion === null) {
+                    this.tempRegion = createPolygonRegion();
+                }
+                if (this.tempRegion.type != REGION_TYPE_POLYGON) {
+                    this.tempRegion = createPolygonRegion();
+                }
+                this.tempRegion = resetPolygonRegion(this.tempRegion);
                 break;
         }
     }    
@@ -85,15 +99,15 @@ export class RegionSelector extends Component {
     draw() {
         const {canvas} = this;
         canvas.primitive().clear();
-        for (let i = 0; i < this.regions.list.length; i++)
+        for (let i = 0; i < this.regionList.length; i++)
         {
-            if (this.showNodes && i == this.regions.config.selectedRegion) {
+            if (this.showNodes && i == this.regionConfig.selectedRegion) {
                 this.drawFilter(this.tempRegion, canvas);
                 this.drawNodes(this.tempRegion);
-            } else if (!this.regions.list[i].saved) {
+            } else if (!this.regionList[i].saved) {
                 this.drawFilter(this.tempRegion, canvas);
             } else {
-                this.drawFilter(this.regions.list[i], canvas);
+                this.drawFilter(this.regionList[i], canvas);
             }        
         }
     }
@@ -106,14 +120,14 @@ export class RegionSelector extends Component {
      * currently a valid option.
      */
     tryToggleNodes() {
-        if (this.regions.list.length <= 0) { return false; }
-        if(this.regions.config.selectedRegion < 0 || 
-            this.regions.config.selectedRegion >= this.regions.list.length) {
+        if (this.regionList.length <= 0) { return false; }
+        if(this.regionConfig.selectedRegion < 0 || 
+            this.regionConfig.selectedRegion >= this.regionList.length) {
             return false;
         }
-        if (Object.keys(this.regions.list[this.regions.config.selectedRegion]).length === 0) { return false; }
-        if (this.regions.list[this.regions.config.selectedRegion].type === REGION_TYPE_POLYGON) {
-            if (!this.regions.list[this.regions.config.selectedRegion].closed) {
+        if (Object.keys(this.regionList[this.regionConfig.selectedRegion]).length === 0) { return false; }
+        if (this.regionList[this.regionConfig.selectedRegion].type === REGION_TYPE_POLYGON) {
+            if (!this.regionList[this.regionConfig.selectedRegion].closed) {
                 return false;
             }
         }
@@ -129,12 +143,24 @@ export class RegionSelector extends Component {
      * @param {Object} pos Mouse position.
      * @param {string} type Type of input event. 
      * [MOUSE_INPUT_ENUM]
+     * @param {Object} button The mouse button for 
+     * the event. [MOUSE_BUTTON_ENUM]
      */
-    onRectInput(pos, type) {
+    onRectInput(pos, type, button) {
         //Call correct methods based on input type
         switch(type) {
             case MOUSE_INPUT_PRESS : {
-                this.tempRegion = onRectangleLeftClick(this.tempRegion, this.showNodes, pos);
+                switch(button) {
+                    case MOUSE_BUTTON_LEFT : {
+                        this.tempRegion = onRectangleLeftClick(this.tempRegion, this.showNodes, pos);
+                        break;
+                    }
+                    case MOUSE_BUTTON_MIDDLE :
+                    case MOUSE_BUTTON_RIGHT : {
+                        this.tempRegion = onRectangleRightClick(this.tempRegion, this.showNodes, this.resetRegion);
+                        break;
+                    }
+                }
                 break;                        
             }
             case MOUSE_INPUT_DRAG : {
@@ -142,7 +168,12 @@ export class RegionSelector extends Component {
                 break;
             }
             case MOUSE_INPUT_RELEASE : {
-                this.tempRegion = onRectangleRelease(this.tempRegion, this.saveRegion);
+                switch(button) {
+                    case MOUSE_BUTTON_LEFT : {
+                        this.tempRegion = onRectangleRelease(this.tempRegion, this.saveRegion);
+                        break;
+                    }
+                }
                 break;
             }
         }
@@ -198,7 +229,7 @@ export class RegionSelector extends Component {
 
         switch(this.regionMode) {
             case REGION_MODE_RECTANGLE : {
-                this.onRectInput(pos, type);            
+                this.onRectInput(pos, type, button);            
                 break;
             }
             case REGION_MODE_POLYGON : {
@@ -215,12 +246,16 @@ export class RegionSelector extends Component {
     }
 
     componentWillUpdate(nextProps, nextState) {
-        const {regionMode, regions, saveRegion, saveRegionAction, 
+        const {regionMode, regionList, regionConfig, saveRegion, saveRegionAction, 
             toggleSaveRegion, toggleNodes, showNodes} = nextProps;
 
         if (this.regionMode != regionMode) {
             this.regionMode = regionMode;
             this.assignTempRegion ();
+        }
+        
+        if (this.regionConfig.selectedRegion != regionConfig.selectedRegion) {
+            this.tempRegion = Object.assign({}, regionList[regionConfig.selectedRegion]);
         }
 
         if (saveRegion) {
@@ -233,7 +268,7 @@ export class RegionSelector extends Component {
         if (showNodes) {
             if (this.tryToggleNodes()) {
                 this.showNodes = showNodes;
-                this.tempRegion = regions.list[regions.config.selectedRegion];
+                this.tempRegion = regionList[regionConfig.selectedRegion];
             } else {
                 toggleNodes({state: false});
             }
@@ -268,10 +303,11 @@ export class RegionSelector extends Component {
     }
 
     render() {
-        const {regionMode, regions, layerConfig, toggleNodes, addRegion, removeRegion, saveRegion,
+        const {regionMode, regionList, regionConfig, layerConfig, toggleNodes, addRegion, removeRegion, saveRegion,
             saveRegionAction, updateSelectedRegion, resetRegion} = this.props;
         this.regionMode = regionMode;
-        this.regions = regions;
+        this.regionList = regionList;
+        this.regionConfig = {...regionConfig};
         this.layerConfig = layerConfig;
         this.toggleNodes = toggleNodes;
         this.addRegion = addRegion;

@@ -1,6 +1,6 @@
 const config = () => {
     return {
-        selectedRegion: -1,
+        selectedRegion: 0,
         showNodes: false
     };
 };

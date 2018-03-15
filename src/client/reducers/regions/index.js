@@ -1,7 +1,5 @@
-import { ACTION_ADD_REGION, ACTION_REMOVE_REGION,
-    ACTION_SAVE_REGION, ACTION_UPDATE_SELECTED_REGION,
-    ACTION_TOGGLE_NODES,
-    ACTION_RESET_REGION} from '../../containers/home/actions/action-types';
+import { ACTION_ADD_REGION, ACTION_REMOVE_REGION, ACTION_SAVE_REGION, ACTION_UPDATE_SELECTED_REGION,
+    ACTION_TOGGLE_NODES, ACTION_RESET_REGION} from '../../containers/home/actions';
 import addRegion from './add-region';
 import removeRegion from './remove-region';
 import config from './config';

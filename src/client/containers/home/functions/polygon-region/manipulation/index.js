@@ -1,5 +1,5 @@
 import { MIN_POLYGON_NODES } from '../../../../../reducers/regions/default-region/polygon-region';
-import { defaultPolygon, defaultPos } from '../../defaults';
+import { defaultPos } from '../../defaults';
 import { getDistanceBetweenPoints } from '../../utilities';
 import node from '../../../../../reducers/regions/default-region/nodes/node';
 
@@ -7,11 +7,11 @@ import node from '../../../../../reducers/regions/default-region/nodes/node';
 /**
  * Adds a polygon node at the specified point and joins it to the correct nodes.
  * NOTE: Currently buggy and does NOT correctly join the node in certain situations. To be fixed.
- * @param {Object} [polygon=defaultPolygon()] Polygon to be modified.
+ * @param {Object} [polygon=createPolygonRegion()] Polygon to be modified.
  * @param {Object} [pos=defaultPos()] Position to add node.
  * @returns {Object} Modified polygon
  */
-export const addPolygonNode = (polygon = defaultPolygon(), pos = defaultPos()) => {
+export const addPolygonNode = (polygon = createPolygonRegion(), pos = defaultPos()) => {
     //Get the distance between the point and previously adjoining node to the current closest node.
     let prevDist = -1;
     if (polygon.closestNode.index - 1 >= 0) {
@@ -24,7 +24,8 @@ export const addPolygonNode = (polygon = defaultPolygon(), pos = defaultPos()) =
     //Get the distance between the point and next adjoining node to the current closest node.
     let nextDist = -1;
     if (polygon.closestNode.index + 1 < polygon.nodes.length) {
-        nextDist = getDistanceBetweenPoints(pos.x, pos.y, polygon.nodes[polygon.closestNode.index + 1].x, polygon.nodes[polygon.closestNode.index + 1].y);
+        nextDist = getDistanceBetweenPoints(pos.x, pos.y, polygon.nodes[polygon.closestNode.index + 1].x, 
+            polygon.nodes[polygon.closestNode.index + 1].y);
     } else {
         nextDist = getDistanceBetweenPoints(pos.x, pos.y, polygon.nodes[0].x, polygon.nodes[0].y);                                            
     }
@@ -42,10 +43,10 @@ export const addPolygonNode = (polygon = defaultPolygon(), pos = defaultPos()) =
 
 /**
  * Remove the currently selected polygon node.
- * @param {Object} [polygon=defaultPolygon()] Polygon to be modified.
+ * @param {Object} [polygon=createPolygonRegion()] Polygon to be modified.
  * @returns {Object} Modified polygon
  */
-export const removePolygonNode = (polygon = defaultPolygon()) => {
+export const removePolygonNode = (polygon = createPolygonRegion()) => {
     //Exit early as the polygon is the smallest it can be.
     if (polygon.nodes.length <= MIN_POLYGON_NODES) { return polygon; }
     polygon.nodes.splice(polygon.selectedNodeIndex, 1);

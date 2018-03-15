@@ -1,9 +1,21 @@
-import { ACTION_REGION_MODE, ACTION_ADD_REGION, ACTION_REMOVE_REGION, ACTION_TOGGLE_NODES,
-    ACTION_SAVE_REGION, ACTION_TOGGLE_SAVE_REGION, ACTION_UPDATE_SELECTED_REGION,
-    ACTION_RESET_REGION } from './action-types';
-import { REGION_MODE_RECTANGLE } from '../enums/region-modes';
+//================================================================================
+// Action Type Constants
+//================================================================================
+export const ACTION_REGION_MODE = 'ACTION-REGION-MODE';
+export const ACTION_ADD_REGION = 'ACTION-ADD-REGION';
+export const ACTION_REMOVE_REGION = 'ACTION-REMOVE-REGION';
+export const ACTION_RESET_REGION = 'ACTION-RESET-REGION';
+export const ACTION_TOGGLE_SAVE_REGION = 'ACTION-TOGGLE-SAVE-REGION';
+export const ACTION_SAVE_REGION = 'ACTION-SAVE-REGION';
+export const ACTION_UPDATE_SELECTED_REGION = 'ACTION-UPDATE-SELECTED-REGION';
+export const ACTION_TOGGLE_NODES = 'ACTION-TOGGLE-NODES';
 
-import('./action-types/index.js');
+//================================================================================
+// Action-Related Constants
+//================================================================================
+// Region Modes ==================================================================
+export const REGION_MODE_RECTANGLE = 'REGION-MODE-RECTANGLE';
+export const REGION_MODE_POLYGON = 'REGION-MODE-POLYGON';
 
 export const ActionCreators = {
     /**

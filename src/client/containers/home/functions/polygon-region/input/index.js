@@ -1,12 +1,13 @@
-import { MOUSE_BUTTON_LEFT } from '../../../enums/mouse-buttons';
+import { MOUSE_BUTTON_LEFT } from '../../../constants';
 import node, { NODE_RADIUS, NODE_STROKE_THICKNESS } from
     '../../../../../reducers/regions/default-region/nodes/node';
 import closestNode from '../../../../../reducers/regions/default-region/nodes/closest-node';
-import { defaultPolygon, defaultPos } from '../../defaults';
+import { defaultPos } from '../../defaults';
 import { removePolygonNode, addPolygonNode } from '../manipulation';
 import { getPointWithinRadiusOfPoint, getDistanceBetweenPoints } from '../../utilities';
-import { MIN_POLYGON_NODES } from '../../../../../reducers/regions/default-region/polygon-region';
-import { REGION_MODE_POLYGON } from '../../../enums/region-modes';
+import createPolygonRegion, { MIN_POLYGON_NODES, resetPolygonRegion }
+    from '../../../../../reducers/regions/default-region/polygon-region';
+import { REGION_MODE_POLYGON } from '../../../actions';
 
 /*eslint-disable*/
 /**
@@ -14,12 +15,12 @@ import { REGION_MODE_POLYGON } from '../../../enums/region-modes';
  * Sets the polygon start point.
  * If nodes are manipulatable, checks if the click intersects a node
  * and selects it.
- * @param {Object} [polygon=defaultPolygon()] Polygon to handle input for.
+ * @param {Object} [polygon=createPolygonRegion()] Polygon to handle input for.
  * @param {boolean} [showNodes=false] Are nodes currently being shown?
  * @param {Object} [pos=defaultPos()] Position to add node to or check.
  * @returns {Object} Modified polygon.
  */
-export const onPolygonLeftClick = (polygon = defaultPolygon(), showNodes = false, pos = defaultPos()) => {
+export const onPolygonLeftClick = (polygon = createPolygonRegion(), showNodes = false, pos = defaultPos()) => {
     if (!showNodes) {
         //Return as the polygon can't be changed now
         if (polygon.closed) { return polygon; }
@@ -48,14 +49,14 @@ export const onPolygonLeftClick = (polygon = defaultPolygon(), showNodes = false
  * If an unclosed temporary region, the polygon will be closed.
  * If a closed temporary region, the polygon will be reset.
  * If nodes are manipulatable, will add or remove a node.
- * @param {Object} [polygon=defaultPolygon()] Polygon to handle input for.
+ * @param {Object} [polygon=createPolygonRegion()] Polygon to handle input for.
  * @param {boolean} [showNodes=false] Are nodes currently being shown?
  * @param {Object} [pos=defaultPos()] Position to add node to.
  * @param {function} [resetAction=null] Reset Region action. 
  * @param {function} [saveAction=null] Save Region action. 
  * @returns {Object} Modified polygon.
  */
-export const onPolygonRightClick = (polygon = defaultPolygon(), showNodes = false, pos = defaultPos(), 
+export const onPolygonRightClick = (polygon = createPolygonRegion(), showNodes = false, pos = defaultPos(), 
     resetAction = null, saveAction = null) => {
 
     if (!showNodes) {
@@ -65,10 +66,10 @@ export const onPolygonRightClick = (polygon = defaultPolygon(), showNodes = fals
             if (saveAction !== null) {
                 saveAction({region: Object.assign({}, polygon)});
             }
-            polygon = defaultPolygon();
+            polygon = resetPolygonRegion(polygon);
         } else {
             //If the polygon was already closed reset it
-            polygon = defaultPolygon();
+            polygon = resetPolygonRegion(polygon);
             if (resetAction !== null) {
                 resetAction({mode:REGION_MODE_POLYGON});
             }
@@ -91,12 +92,12 @@ export const onPolygonRightClick = (polygon = defaultPolygon(), showNodes = fals
 /**
  * Handles dragging input for a polygon region.
  * Updates selected node position if possible.
- * @param {Object} [polygon=defaultPolygon()] Polygon to handle input for.
+ * @param {Object} [polygon=createPolygonRegion()] Polygon to handle input for.
  * @param {boolean} [showNodes=false] Are nodes currently being shown?
  * @param {Object} [pos=defaultPos()] Position to update current node with.
  * @returns {Object} Modified polygon.
  */
-export const onPolygonDrag = (polygon = defaultPolygon(), showNodes = false, pos = defaultPos()) => {
+export const onPolygonDrag = (polygon = createPolygonRegion(), showNodes = false, pos = defaultPos()) => {
     if (!showNodes) {
         //Polygon isn't modifiable anymore
         if (polygon.closed) { return polygon; }
@@ -116,12 +117,12 @@ export const onPolygonDrag = (polygon = defaultPolygon(), showNodes = false, pos
 /**
  * Handles input release for a polygon region.
  * Modifies the selected node index.
- * @param {Object} [polygon=defaultPolygon()] Polygon to handle input for.
+ * @param {Object} [polygon=createPolygonRegion()] Polygon to handle input for.
  * @param {boolean} [showNodes=false] Are nodes currently being shown?
  * @param {number} [button=MOUSE_BUTTON_LEFT] Which button was released. [MOUSE_BUTTON_ENUM]
  * @returns {Object} Modified polygon
  */
-export const onPolygonRelease = (polygon = defaultPolygon(), showNodes = false, button = MOUSE_BUTTON_LEFT) => {
+export const onPolygonRelease = (polygon = createPolygonRegion(), showNodes = false, button = MOUSE_BUTTON_LEFT) => {
     if (!showNodes) {
         if (polygon.closed) { return polygon; }
         if ( button === MOUSE_BUTTON_LEFT ) {
@@ -136,11 +137,11 @@ export const onPolygonRelease = (polygon = defaultPolygon(), showNodes = false, 
 /**
  * Checks if a polygon node has been clicked on and updates the 
  * closestNode property of the polygon with the information.
- * @param {Object} [polygon=defaultPolygon()] Polygon to check.
+ * @param {Object} [polygon=createPolygonRegion()] Polygon to check.
  * @param {Object} [pos=defaultPos()] Position to check for node.
  * @returns {Object} Modified polygon.
  */
-export const checkForPolygonNodeSelection = (polygon = defaultPolygon(), pos = defaultPos()) => {
+export const checkForPolygonNodeSelection = (polygon = createPolygonRegion(), pos = defaultPos()) => {
     for (let i = 0; i < polygon.nodes.length; i++) {
         //Get the distance between the current node and the point
         const dist = getDistanceBetweenPoints(pos.x, pos.y, polygon.nodes[i].x, polygon.nodes[i].y);

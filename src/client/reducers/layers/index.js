@@ -1,5 +1,5 @@
 import config from './config';
-import { TOGGLE_NODES } from '../../containers/home/actions/action-types';
+import { TOGGLE_NODES } from '../../containers/home/actions';
 
 const defaultLayers = {
     config: config(),

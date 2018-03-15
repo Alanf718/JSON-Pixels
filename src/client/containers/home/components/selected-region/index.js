@@ -15,7 +15,6 @@ export class SelectedRegion extends Component {
         const {toggleNodes, toggleNodesState} = this.props;
         return (
             <div className="display zoomed-display">
-                <canvas width="320" height="320"/>
                 <div className="tool-bar">
                     <button type="button" onClick={() => toggleNodes({state: toggleNodesState})}>Toggle Nodes</button>
                 </div>

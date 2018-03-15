@@ -1,9 +1,15 @@
 import node from '../nodes/node';
-import { REGION_TYPE_RECTANGLE } from '../../../../containers/home/enums/region-types';
+import { REGION_TYPE_RECTANGLE } from '../../../../containers/home/constants';
+import createBaseRegion, { resetBaseRegion } from '..';
 
-const rectangleRegion = () => {
+export const rectangleRegionNonResettable = () => {
     return {
-        type: REGION_TYPE_RECTANGLE,
+        type: REGION_TYPE_RECTANGLE
+    };
+};
+
+export const rectangleRegionResettable = () => {
+    return {
         width: 0,
         height: 0,
         nodes: [
@@ -15,4 +21,12 @@ const rectangleRegion = () => {
     };
 };
 
-export default rectangleRegion;
+export const resetRectangleRegion = (region) => {
+    return Object.assign(resetBaseRegion(region), rectangleRegionResettable());
+};
+
+const createRectangleRegion = () => {
+    return Object.assign(createBaseRegion(), rectangleRegionNonResettable(), rectangleRegionResettable());
+};
+
+export default createRectangleRegion;

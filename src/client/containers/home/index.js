@@ -1,12 +1,12 @@
 import React, {Component} from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import {ActionCreators} from './actions/index';
+import {ActionCreators, REGION_MODE_RECTANGLE, REGION_MODE_POLYGON} from './actions/index';
 import {RegionSelector} from './components/region-selector';
 import {SelectedRegion} from './components/selected-region';
 
 import './style.scss';
-import { REGION_MODE_RECTANGLE, REGION_MODE_POLYGON } from './enums/region-modes';
+import { RegionTree } from './components/region-tree';
 
 /* eslint-disable no-unused-vars */
 const selected = {
@@ -43,7 +43,8 @@ export class Home extends Component {
                         toggleSaveRegion={toggleSaveRegion}
                         toggleNodes={toggleNodes}
                         showNodes={toggleNodesState}
-                        regions={regions}
+                        regionList={regions.list}
+                        regionConfig={regions.config}
                         layerConfig={layers.config}
                         addRegion={addRegion}
                         removeRegion={removeRegion}
@@ -58,9 +59,12 @@ export class Home extends Component {
                     <button onClick={() => regionMode({mode: REGION_MODE_POLYGON})}>Polygon</button>
 
                     <pre id="debug">
-                        {JSON.stringify(config)}
+                        {JSON.stringify(regions.list[regions.config.selectedRegion])}
                     </pre>
                 </div>
+                <RegionTree
+                    regions={regions.list}
+                />
                 <SelectedRegion
                     toggleNodes={toggleNodes}
                     toggleNodesState={!toggleNodesState}

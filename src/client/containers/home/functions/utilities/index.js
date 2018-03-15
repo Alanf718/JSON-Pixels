@@ -56,4 +56,29 @@ export const getPointWithinRadiusOfPoint = function(mx,my,nx,ny,radius) {
         return true;
     } 
     return false;
-}  
+}
+
+let ID_TOTAL_GENERATED = 0;
+/**
+ * Create and return a unique numerical ID.
+ * Starts at 0 and increments with each ID
+ * created, regardless of destroyed objects.
+ * @returns {number} Generated ID.
+ */
+export const generateID = function() {
+    incrementTotalGeneratedIDs(); 
+    return ID_TOTAL_GENERATED - 1;
+};
+
+/**
+ * Adds one to the total number of generated
+ * IDs so far. Mutates the constant variable
+ * representing this value.
+ */
+export const incrementTotalGeneratedIDs = function() {
+    ID_TOTAL_GENERATED += 1;
+};
+
+export const getTotalGeneratedIDs = function () {
+    return ID_TOTAL_GENERATED;
+}
