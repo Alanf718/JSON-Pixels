@@ -121,14 +121,18 @@ export const onRectangleDrag = (rect = createRectangleRegion(), showNodes = fals
  * Handles input release for a rectangle region.
  * Modifies the selected node index and saves the region.
  * @param {Object} [rect=createRectangleRegion()] Rectangle to handle input for.
- * @param {function} [action=null] Save Region action.
+ * @param {function} [saveAction=null] Save Region action.
+ * @param {function} [updateSelectedAction=null] Update Selected Region ID action.
  * @returns {Object} Modified rectangle.
  */
-export const onRectangleRelease = (rect = createRectangleRegion(), action = null) => {
+export const onRectangleRelease = (rect = createRectangleRegion(), saveAction = null, updateSelectedAction = null) => {
     //Reset the selected node.
     rect.selectedNodeIndex = -1;
-    if (action !== null ) {
-        action({region: Object.assign({}, rect)});
+    if (saveAction !== null ) {
+        saveAction({region: Object.assign({}, rect)});
+        if (updateSelectedAction !== null) {
+            updateSelectedAction({id: rect.id})
+        }
     }
 
     return rect;

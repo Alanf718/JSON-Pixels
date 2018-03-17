@@ -28,7 +28,8 @@ export class Home extends Component {
     render() {
         const {regionMode, config, toggleNodes, toggleSaveRegion, regions,
             layers, addRegion, removeRegion, saveRegion, updateSelectedRegion,
-            resetRegion} = this.props;
+            updateSelectedRegionID, resetRegion, tree, editName, saveName,
+            shiftRegionUp, shiftRegionDown} = this.props;
 
         /*eslint-disable*/
         const toggleNodesState = regions.config.showNodes;
@@ -50,24 +51,45 @@ export class Home extends Component {
                         removeRegion={removeRegion}
                         resetRegion={resetRegion}
                         updateSelectedRegion={updateSelectedRegion}
+                        updateSelectedRegionID={updateSelectedRegionID}
                     />
                     <button onClick={() => {
-                        addRegion({mode: regionMode});
+                        addRegion({mode: config.regionMode});
                         updateSelectedRegion({index: regions.config.selectedRegion + 1});
+                        updateSelectedRegionID({id: regions.list[regions.config.selectedRegion].id});
                     }}>New Region</button>
-                    <button onClick={() => regionMode({mode: REGION_MODE_RECTANGLE})}>Rectangle</button>
-                    <button onClick={() => regionMode({mode: REGION_MODE_POLYGON})}>Polygon</button>
+                    <button onClick={() => {
+                        regionMode({mode: REGION_MODE_RECTANGLE});
+                        updateSelectedRegionID({id: regions.list[regions.config.selectedRegion].id});
+                    }}>Rectangle</button>
+                    <button onClick={() => {
+                        regionMode({mode: REGION_MODE_POLYGON});
+                        updateSelectedRegionID({id: regions.list[regions.config.selectedRegion].id});
+                    }}>Polygon</button>
 
                     <pre id="debug">
-                        {JSON.stringify(regions.list[regions.config.selectedRegion])}
+                        {JSON.stringify(config)}
                     </pre>
                 </div>
                 <RegionTree
                     regions={regions.list}
+                    selectedID={regions.config.selectedRegionID}
+                    updateSelectedRegion={updateSelectedRegion}
+                    updateSelectedRegionID={updateSelectedRegionID}
+                    regionMode={regionMode}
+                    readonly={tree.readonly}
+                    saveName={saveName}
                 />
                 <SelectedRegion
                     toggleNodes={toggleNodes}
                     toggleNodesState={!toggleNodesState}
+                    editName={editName}
+                    readonly={tree.readonly}
+                    shiftRegionUp={shiftRegionUp}
+                    shiftRegionDown={shiftRegionDown}
+                    updateSelectedRegion={updateSelectedRegion}
+                    updateSelectedRegionID={updateSelectedRegionID}
+                    index={regions.config.selectedRegion}       
                 />
             </div>
 

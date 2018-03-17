@@ -54,10 +54,11 @@ export const onPolygonLeftClick = (polygon = createPolygonRegion(), showNodes = 
  * @param {Object} [pos=defaultPos()] Position to add node to.
  * @param {function} [resetAction=null] Reset Region action. 
  * @param {function} [saveAction=null] Save Region action. 
+ * @param {function} [updateSelectedAction=null] Update Selected Region ID action. 
  * @returns {Object} Modified polygon.
  */
 export const onPolygonRightClick = (polygon = createPolygonRegion(), showNodes = false, pos = defaultPos(), 
-    resetAction = null, saveAction = null) => {
+    resetAction = null, saveAction = null, updateSelectedAction=null) => {
 
     if (!showNodes) {
         //Close the polygon frame if it's a legal polygon
@@ -65,6 +66,9 @@ export const onPolygonRightClick = (polygon = createPolygonRegion(), showNodes =
             polygon.closed = true;
             if (saveAction !== null) {
                 saveAction({region: Object.assign({}, polygon)});
+                if (updateSelectedAction !== null) {
+                    updateSelectedAction({id: polygon.id})
+                }
             }
             polygon = resetPolygonRegion(polygon);
         } else {

@@ -1,5 +1,5 @@
 import { defaultRegions } from '..';
-import { REGION_MODE_POLYGON, REGION_MODE_RECTANGLE } from '../../../containers/home/constants';
+import { REGION_MODE_POLYGON, REGION_MODE_RECTANGLE } from '../../../containers/home/actions';
 import createPolygonRegion from '../default-region/polygon-region';
 import createRectangleRegion from '../default-region/rect-region';
 

@@ -82,3 +82,19 @@ export const incrementTotalGeneratedIDs = function() {
 export const getTotalGeneratedIDs = function () {
     return ID_TOTAL_GENERATED;
 }
+
+/**
+ * Returns a new object cloned from the current
+ * object only containing the passed in properties.
+ * @param {Object} object The object to pull properties from.
+ * @param {array} properties An array of property names.
+ * @returns {Object} Newly constructed object.
+ */
+export const pick = function (object, properties) {
+    return properties.reduce((obj, property) => {
+         obj[property] = object[property];
+         return obj;
+    }, {})
+}
+
+Array.prototype.swap = function(a,b){ var tmp=this[a];this[a]=this[b];this[b]=tmp;};

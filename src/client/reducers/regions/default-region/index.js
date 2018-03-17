@@ -1,4 +1,4 @@
-import { getRandomColour, generateID } from '../../../containers/home/functions/utilities';
+import { getRandomColour, generateID, pick } from '../../../containers/home/functions/utilities';
 import closestNode from './nodes/closest-node';
 
 export const baseRegionNonResettable = () => {
@@ -22,6 +22,10 @@ export const baseRegionResettable = () => {
 
 export const resetBaseRegion = (region) => {
     return Object.assign(region, baseRegionResettable());
+};
+
+export const overwriteResettableRegionProperties = (oldRegion, newRegion) => {
+    return Object.assign({}, newRegion, pick(oldRegion, Object.getOwnPropertyNames(baseRegionNonResettable())));
 };
 
 const createBaseRegion = () => {

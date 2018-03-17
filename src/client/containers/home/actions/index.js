@@ -8,7 +8,12 @@ export const ACTION_RESET_REGION = 'ACTION-RESET-REGION';
 export const ACTION_TOGGLE_SAVE_REGION = 'ACTION-TOGGLE-SAVE-REGION';
 export const ACTION_SAVE_REGION = 'ACTION-SAVE-REGION';
 export const ACTION_UPDATE_SELECTED_REGION = 'ACTION-UPDATE-SELECTED-REGION';
+export const ACTION_UPDATE_SELECTED_REGION_ID = 'ACTION-UPDATE-SELECTED-REGION-ID';
 export const ACTION_TOGGLE_NODES = 'ACTION-TOGGLE-NODES';
+export const ACTION_SHIFT_REGION_UP = 'ACTION-SHIFT-REGION-UP';
+export const ACTION_SHIFT_REGION_DOWN = 'ACTION-SHIFT-REGION-DOWN';
+export const ACTION_EDIT_NAME = 'ACTION-EDIT-NAME';
+export const ACTION_SAVE_NAME = 'ACTION-SAVE-NAME';
 
 //================================================================================
 // Action-Related Constants
@@ -112,6 +117,19 @@ export const ActionCreators = {
     },
 
     /**
+     * Updates the currently selected region ID to the
+     * specified value.
+     * @param {number} [id=null] [n]
+     * @returns {{type: string, payload: number}} action
+     */
+    updateSelectedRegionID: ({id = null}) => {
+        return {
+            type: ACTION_UPDATE_SELECTED_REGION_ID,
+            payload: id
+        };
+    },
+
+    /**
      * Toggles whether to display nodes for the regions
      * within the currently selected layer.
      * @param {boolean} state [n]
@@ -121,6 +139,54 @@ export const ActionCreators = {
         return {
             type: ACTION_TOGGLE_NODES,
             payload: state
+        };
+    },
+
+    /**
+     * Moves the region up in the tree hierarchy.
+     * Shifts it's subsequent position in the region list.
+     * @returns {{type: string}} action
+     */
+    shiftRegionUp: () => {
+        return {
+            type: ACTION_SHIFT_REGION_UP
+        };
+    },
+
+    /**
+     * Moves the region down in the tree hierarchy.
+     * Shifts it's subsequent position in the region list.
+     * @returns {{type: string}} action
+     */
+    shiftRegionDown: () => {
+        return {
+            type: ACTION_SHIFT_REGION_DOWN
+        };
+    },
+
+    /**
+     * Sets whether the user can edit the current
+     * region's name field in the tree.
+     * @param {boolean} state [n]
+     * @returns {{type: string, payload: boolean}} action
+     */
+    editName: ({state}) => {
+        return {
+            type: ACTION_EDIT_NAME,
+            payload: state
+        };
+    },
+
+    /**
+     * Saves the value of the name input field to
+     * the region.
+     * @param {string} name [n]
+     * @returns {{type: string, payload: string}} action
+     */
+    saveName: ({value}) => {
+        return {
+            type: ACTION_SAVE_NAME,
+            payload: value
         };
     }
 };
