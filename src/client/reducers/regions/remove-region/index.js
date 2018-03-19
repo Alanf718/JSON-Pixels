@@ -1,11 +1,18 @@
 import { defaultRegions } from '..';
 
-const removeRegion = (state = defaultRegions(), payload = {}) => {
+/*eslint-disable*/
+const removeRegion = (state = defaultRegions(), payload = null) => {
     let obj = Object.assign({}, state);
+    
+    if (obj.list.length <= 1) { return state; }
 
-    if (payload < 0 || payload > obj.length) { return obj.list.splice(obj.config.selectedRegion, 1); }
+    if (payload === null || payload < 0 || payload > obj.length) {
+        obj.list.splice(obj.config.selectedRegion, 1);
+        return obj;
+    }
 
-    return obj.list.splice(payload, 1);
+    obj.list.splice(payload, 1);
+    return obj;
 };
 
 export default removeRegion;

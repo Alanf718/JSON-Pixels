@@ -16,15 +16,11 @@ import createRectangleRegion, { resetRectangleRegion }
  * @param {Object} [rect=createRectangleRegion()] Rectangle to handle input for.
  * @param {boolean} [showNodes=false] Are nodes currently being shown?
  * @param {Object} [pos=defaultPos()] Position to add node to or check.
- * @param {function} [action=null] Add Region action.
  * @returns {Object} Modified rectangle.
  */
-export const onRectangleLeftClick = (rect = createRectangleRegion(), showNodes = false, pos = defaultPos(), action = null) => {
+export const onRectangleLeftClick = (rect = createRectangleRegion(), showNodes = false, pos = defaultPos()) => {
     //Start drawing a new rectangle if nodes aren't turned on
-    if (!showNodes) {
-        if (action !== null) {
-            action({mode: REGION_MODE_RECTANGLE, region: rect});            
-        }
+    if (!showNodes && !rect.saved) {
         rect = resetRectangleRegion(rect);
         rect.nodes[0] = pos;
     } else {
@@ -105,6 +101,7 @@ export const onRectangleDrag = (rect = createRectangleRegion(), showNodes = fals
             }                      
         }
     } else {
+        if (rect.saved) {return rect;}
         //Simply drag the rect to set the size
         rect.width = pos.x - rect.nodes[0].x;
         rect.height = pos.y - rect.nodes[0].y;
@@ -128,8 +125,9 @@ export const onRectangleDrag = (rect = createRectangleRegion(), showNodes = fals
 export const onRectangleRelease = (rect = createRectangleRegion(), saveAction = null, updateSelectedAction = null) => {
     //Reset the selected node.
     rect.selectedNodeIndex = -1;
-    if (saveAction !== null ) {
+    if (saveAction !== null && !rect.saved ) {
         saveAction({region: Object.assign({}, rect)});
+        rect.saved = true;
         if (updateSelectedAction !== null) {
             updateSelectedAction({id: rect.id})
         }

@@ -49,6 +49,7 @@ export class RegionSelector extends Component {
                     this.tempRegion = resetRectangleRegion(obj);
                 }
                 this.tempRegion = resetRectangleRegion(this.tempRegion);
+                this.tempRegion.saved = this.regionList[this.regionConfig.selectedRegion].saved;
                 break;
             case REGION_MODE_POLYGON:
                 if (this.tempRegion === null) {
@@ -59,6 +60,7 @@ export class RegionSelector extends Component {
                     this.tempRegion = resetPolygonRegion(obj);
                 }
                 this.tempRegion = resetPolygonRegion(this.tempRegion);
+                this.tempRegion.saved = this.regionList[this.regionConfig.selectedRegion].saved;                
                 break;
         }
     }    
@@ -129,6 +131,7 @@ export class RegionSelector extends Component {
             return false;
         }
         if (Object.keys(this.regionList[this.regionConfig.selectedRegion]).length === 0) { return false; }
+        if (!this.regionList[this.regionConfig.selectedRegion].saved) { return false; }
         if (this.regionList[this.regionConfig.selectedRegion].type === REGION_TYPE_POLYGON) {
             if (!this.regionList[this.regionConfig.selectedRegion].closed) {
                 return false;
@@ -255,7 +258,7 @@ export class RegionSelector extends Component {
         if (this.regionMode != regionMode) {
             this.regionMode = regionMode;
             let region = regionList[regionConfig.selectedRegion];
-            if (convertRegionTypeToMode(region.type) === regionMode ) {
+            if (convertRegionTypeToMode(region.type) === regionMode) {
                 this.tempRegion = region;
             } else {
                 this.assignTempRegion();
@@ -314,15 +317,13 @@ export class RegionSelector extends Component {
     }
 
     render() {
-        const {regionMode, regionList, regionConfig, layerConfig, toggleNodes, addRegion, removeRegion, saveRegion,
+        const {regionMode, regionList, regionConfig, layerConfig, toggleNodes, saveRegion,
             saveRegionAction, updateSelectedRegion, updateSelectedRegionID, resetRegion} = this.props;
         this.regionMode = regionMode;
         this.regionList = regionList;
         this.regionConfig = {...regionConfig};
         this.layerConfig = layerConfig;
         this.toggleNodes = toggleNodes;
-        this.addRegion = addRegion;
-        this.removeRegion = removeRegion;
         this.resetRegion = resetRegion;
         this.saveRegion = saveRegionAction;
         this.updateSelectedRegion = updateSelectedRegion;

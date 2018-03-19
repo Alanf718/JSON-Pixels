@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import {ActionCreators, REGION_MODE_RECTANGLE, REGION_MODE_POLYGON} from './actions/index';
+import {ActionCreators, REGION_MODE_RECTANGLE, REGION_MODE_POLYGON, REGION_MODE_GROUP} from './actions/index';
 import {RegionSelector} from './components/region-selector';
 import {SelectedRegion} from './components/selected-region';
 
@@ -29,10 +29,11 @@ export class Home extends Component {
         const {regionMode, config, toggleNodes, toggleSaveRegion, regions,
             layers, addRegion, removeRegion, saveRegion, updateSelectedRegion,
             updateSelectedRegionID, resetRegion, tree, editName, saveName,
-            shiftRegionUp, shiftRegionDown} = this.props;
+            shiftRegionUp, shiftRegionDown, createGroup} = this.props;
 
         /*eslint-disable*/
         const toggleNodesState = regions.config.showNodes;
+        const canChangeRegionMode = config.regionMode !== REGION_MODE_GROUP ? true : false;
 
         return (
             <div className="frame-tags">
@@ -48,21 +49,28 @@ export class Home extends Component {
                         regionConfig={regions.config}
                         layerConfig={layers.config}
                         addRegion={addRegion}
-                        removeRegion={removeRegion}
                         resetRegion={resetRegion}
                         updateSelectedRegion={updateSelectedRegion}
                         updateSelectedRegionID={updateSelectedRegionID}
                     />
                     <button onClick={() => {
                         addRegion({mode: config.regionMode});
-                        updateSelectedRegion({index: regions.config.selectedRegion + 1});
+                        updateSelectedRegion({index: regions.list.length - 1});
                         updateSelectedRegionID({id: regions.list[regions.config.selectedRegion].id});
+                        toggleNodes({state: false});
                     }}>New Region</button>
                     <button onClick={() => {
+                        regionMode({mode: REGION_MODE_GROUP});
+                        createGroup({});
+                        updateSelectedRegion({index: regions.config.selectedRegion});
+                        updateSelectedRegionID({id: regions.list[regions.config.selectedRegion].id});
+                        toggleNodes({state: false});
+                    }}>New Group</button>
+                    <button disabled={!canChangeRegionMode} onClick={() => {
                         regionMode({mode: REGION_MODE_RECTANGLE});
                         updateSelectedRegionID({id: regions.list[regions.config.selectedRegion].id});
                     }}>Rectangle</button>
-                    <button onClick={() => {
+                    <button disabled={!canChangeRegionMode} onClick={() => {
                         regionMode({mode: REGION_MODE_POLYGON});
                         updateSelectedRegionID({id: regions.list[regions.config.selectedRegion].id});
                     }}>Polygon</button>
@@ -89,7 +97,8 @@ export class Home extends Component {
                     shiftRegionDown={shiftRegionDown}
                     updateSelectedRegion={updateSelectedRegion}
                     updateSelectedRegionID={updateSelectedRegionID}
-                    index={regions.config.selectedRegion}       
+                    index={regions.config.selectedRegion}     
+                    removeRegion={removeRegion}  
                 />
             </div>
 

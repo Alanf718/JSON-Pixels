@@ -9,6 +9,7 @@
 //================================================================================
 export const REGION_TYPE_RECTANGLE = 'REGION-TYPE-RECTANGLE';
 export const REGION_TYPE_POLYGON = 'REGION-TYPE-POLYGON';
+export const REGION_TYPE_GROUP = 'REGION-TYPE-GROUP';
 
 //================================================================================
 // Rectangle Nodes

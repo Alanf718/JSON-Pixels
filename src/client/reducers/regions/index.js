@@ -2,7 +2,8 @@ import { ACTION_ADD_REGION, ACTION_REMOVE_REGION, ACTION_SAVE_REGION, ACTION_UPD
     ACTION_TOGGLE_NODES, ACTION_RESET_REGION, ACTION_UPDATE_SELECTED_REGION_ID,
     ACTION_SAVE_NAME,
     ACTION_SHIFT_REGION_UP,
-    ACTION_SHIFT_REGION_DOWN} from '../../containers/home/actions';
+    ACTION_SHIFT_REGION_DOWN,
+    ACTION_CREATE_GROUP} from '../../containers/home/actions';
 import addRegion from './add-region';
 import removeRegion from './remove-region';
 import config from './config';
@@ -14,6 +15,7 @@ import updateSelectedRegionID from './update-selected-region-id';
 import saveName from './save-name';
 import shiftRegionUp from './shift-region-up';
 import shiftRegionDown from './shift-region-down';
+import createGroup from './create-group';
 
 export const defaultRegions = () => {
     return {
@@ -54,6 +56,9 @@ export const regions = (state = defaultRegions(), {type, payload} = {}) => {
         }
         case ACTION_SAVE_NAME: {
             return saveName(state, payload);
+        }
+        case ACTION_CREATE_GROUP: {
+            return createGroup(state, payload);
         }
         default:
             return state;

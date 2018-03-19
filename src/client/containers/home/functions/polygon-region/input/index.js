@@ -23,7 +23,7 @@ import { REGION_MODE_POLYGON } from '../../../actions';
 export const onPolygonLeftClick = (polygon = createPolygonRegion(), showNodes = false, pos = defaultPos()) => {
     if (!showNodes) {
         //Return as the polygon can't be changed now
-        if (polygon.closed) { return polygon; }
+        if (polygon.closed || polygon.saved) { return polygon; }
         //Set the polygon start point
         if (!polygon.selectedNodeIndex > 0) {
             polygon.nodes[polygon.selectedNodeIndex].x = pos.x;
@@ -70,7 +70,7 @@ export const onPolygonRightClick = (polygon = createPolygonRegion(), showNodes =
                     updateSelectedAction({id: polygon.id})
                 }
             }
-            polygon = resetPolygonRegion(polygon);
+            //polygon = resetPolygonRegion(polygon);
         } else {
             //If the polygon was already closed reset it
             polygon = resetPolygonRegion(polygon);
@@ -104,7 +104,7 @@ export const onPolygonRightClick = (polygon = createPolygonRegion(), showNodes =
 export const onPolygonDrag = (polygon = createPolygonRegion(), showNodes = false, pos = defaultPos()) => {
     if (!showNodes) {
         //Polygon isn't modifiable anymore
-        if (polygon.closed) { return polygon; }
+        if (polygon.closed || polygon.saved) { return polygon; }
         //Update node position
         polygon.nodes[polygon.selectedNodeIndex].x = pos.x;
         polygon.nodes[polygon.selectedNodeIndex].y = pos.y;
@@ -128,7 +128,7 @@ export const onPolygonDrag = (polygon = createPolygonRegion(), showNodes = false
  */
 export const onPolygonRelease = (polygon = createPolygonRegion(), showNodes = false, button = MOUSE_BUTTON_LEFT) => {
     if (!showNodes) {
-        if (polygon.closed) { return polygon; }
+        if (polygon.closed || polygon.saved) { return polygon; }
         if ( button === MOUSE_BUTTON_LEFT ) {
             polygon.selectedNodeIndex++;
         }

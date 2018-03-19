@@ -14,6 +14,8 @@ export const ACTION_SHIFT_REGION_UP = 'ACTION-SHIFT-REGION-UP';
 export const ACTION_SHIFT_REGION_DOWN = 'ACTION-SHIFT-REGION-DOWN';
 export const ACTION_EDIT_NAME = 'ACTION-EDIT-NAME';
 export const ACTION_SAVE_NAME = 'ACTION-SAVE-NAME';
+export const ACTION_CREATE_GROUP = 'ACTION-CREATE-GROUP';
+export const ACTION_ADD_CHILD = 'ACTION-ADD-CHILD';
 
 //================================================================================
 // Action-Related Constants
@@ -21,6 +23,7 @@ export const ACTION_SAVE_NAME = 'ACTION-SAVE-NAME';
 // Region Modes ==================================================================
 export const REGION_MODE_RECTANGLE = 'REGION-MODE-RECTANGLE';
 export const REGION_MODE_POLYGON = 'REGION-MODE-POLYGON';
+export const REGION_MODE_GROUP = 'REGION-MODE-GROUP';
 
 export const ActionCreators = {
     /**
@@ -187,6 +190,32 @@ export const ActionCreators = {
         return {
             type: ACTION_SAVE_NAME,
             payload: value
+        };
+    },
+
+    /**
+     * Creates a new group at the specified index.
+     * @param {number} [index=-1] [n]
+     * @returns {{type: string, payload: number}} action
+     */
+    createGroup: ({index = -1}) => {
+        return {
+            type: ACTION_CREATE_GROUP,
+            payload: index
+        };
+    },
+
+    /**
+     * Adds either a new region as a child of the current
+     * group, or adds a specified current region as a child
+     * of the current group.
+     * @param {number} [index=-1] [n]
+     * @returns {{type: string, payload: number}} action
+     */
+    addChild: ({index = -1}) => {
+        return {
+            type: ACTION_ADD_CHILD,
+            payload: index
         };
     }
 };
