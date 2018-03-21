@@ -39,7 +39,7 @@ export const getRandomColour = function() {
  */
 export const getDistanceBetweenPoints = function(mx,my,nx,ny) {
     return (Math.sqrt(Math.pow((mx - nx), 2) + Math.pow((my - ny), 2)));
-}
+};
 
 /**
  * Calculates and returns whether a specified 
@@ -56,7 +56,7 @@ export const getPointWithinRadiusOfPoint = function(mx,my,nx,ny,radius) {
         return true;
     } 
     return false;
-}
+};
 
 let ID_TOTAL_GENERATED = 0;
 /**
@@ -81,7 +81,7 @@ export const incrementTotalGeneratedIDs = function() {
 
 export const getTotalGeneratedIDs = function () {
     return ID_TOTAL_GENERATED;
-}
+};
 
 /**
  * Returns a new object cloned from the current
@@ -95,6 +95,25 @@ export const pick = function (object, properties) {
          obj[property] = object[property];
          return obj;
     }, {})
-}
+};
 
-Array.prototype.swap = function(a,b){ var tmp=this[a];this[a]=this[b];this[b]=tmp;};
+export const arraySwap = function(arr, x, y) {
+    arr[x] = arr.splice(y, 1, arr[x])[0];
+};
+
+export const arrayMove = function (arr, x, y) {
+    while (x < 0) {
+        x += arr.length;
+    }
+    while (y < 0) {
+        y += arr.length;
+    }
+    if (y >= arr.length) {
+        var k = y - arr.length + 1;
+        while (k--) {
+            arr.push(undefined);
+        }
+    }
+    arr.splice(y, 0, arr.splice(x, 1)[0]);
+    return arr;
+};

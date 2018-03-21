@@ -7,6 +7,7 @@ import {SelectedRegion} from './components/selected-region';
 
 import './style.scss';
 import { RegionTree } from './components/region-tree';
+import { convertRegionTypeToMode } from './functions/utilities/converters';
 
 /* eslint-disable no-unused-vars */
 const selected = {
@@ -29,11 +30,13 @@ export class Home extends Component {
         const {regionMode, config, toggleNodes, toggleSaveRegion, regions,
             layers, addRegion, removeRegion, saveRegion, updateSelectedRegion,
             updateSelectedRegionID, resetRegion, tree, editName, saveName,
-            shiftRegionUp, shiftRegionDown, createGroup} = this.props;
+            shiftRegionUp, shiftRegionDown, createGroup, addChild} = this.props;
 
         /*eslint-disable*/
         const toggleNodesState = regions.config.showNodes;
-        const canChangeRegionMode = config.regionMode !== REGION_MODE_GROUP ? true : false;
+        const isGroupRegion = config.regionMode === REGION_MODE_GROUP ? true : false;
+        const removeRegionNextMode = regions.config.selectedRegion - 1 >= 0 && regions.config.selectedRegion - 1 < regions.list.length ?
+            convertRegionTypeToMode(regions.list[regions.config.selectedRegion - 1].type) : null;
 
         return (
             <div className="frame-tags">
@@ -62,18 +65,34 @@ export class Home extends Component {
                     <button onClick={() => {
                         regionMode({mode: REGION_MODE_GROUP});
                         createGroup({});
-                        updateSelectedRegion({index: regions.config.selectedRegion});
+                        updateSelectedRegion({index: regions.config.selectedRegion + 1});
                         updateSelectedRegionID({id: regions.list[regions.config.selectedRegion].id});
                         toggleNodes({state: false});
                     }}>New Group</button>
-                    <button disabled={!canChangeRegionMode} onClick={() => {
+                    <button disabled={isGroupRegion} onClick={() => {
                         regionMode({mode: REGION_MODE_RECTANGLE});
                         updateSelectedRegionID({id: regions.list[regions.config.selectedRegion].id});
                     }}>Rectangle</button>
-                    <button disabled={!canChangeRegionMode} onClick={() => {
+                    <button disabled={isGroupRegion} onClick={() => {
                         regionMode({mode: REGION_MODE_POLYGON});
                         updateSelectedRegionID({id: regions.list[regions.config.selectedRegion].id});
                     }}>Polygon</button>
+
+                    <br/>
+
+                    <button disabled={!isGroupRegion} onClick={() => {
+                        regionMode({mode: REGION_MODE_RECTANGLE});
+                        addChild({mode: config.regionMode, index: -1});
+                        updateSelectedRegion({index: regions.config.selectedRegion + 1});
+                        updateSelectedRegionID({id: regions.list[regions.config.selectedRegion].id});
+                    }}>Add Child Rectangle</button>
+
+                    <button disabled={!isGroupRegion} onClick={() => {
+                        regionMode({mode: REGION_MODE_POLYGON});
+                        addChild({mode: config.regionMode, index: -1});
+                        updateSelectedRegion({index: regions.config.selectedRegion + 1});
+                        updateSelectedRegionID({id: regions.list[regions.config.selectedRegion].id});
+                    }}>Add Child Polygon</button>
 
                     <pre id="debug">
                         {JSON.stringify(config)}
@@ -87,6 +106,7 @@ export class Home extends Component {
                     regionMode={regionMode}
                     readonly={tree.readonly}
                     saveName={saveName}
+                    toggleNodes={toggleNodes}
                 />
                 <SelectedRegion
                     toggleNodes={toggleNodes}
@@ -98,7 +118,10 @@ export class Home extends Component {
                     updateSelectedRegion={updateSelectedRegion}
                     updateSelectedRegionID={updateSelectedRegionID}
                     index={regions.config.selectedRegion}     
-                    removeRegion={removeRegion}  
+                    removeRegion={removeRegion}
+                    regionMode={regionMode}
+                    mode={removeRegionNextMode}
+                    isGroupRegion={isGroupRegion}
                 />
             </div>
 

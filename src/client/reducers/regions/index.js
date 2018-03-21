@@ -3,7 +3,8 @@ import { ACTION_ADD_REGION, ACTION_REMOVE_REGION, ACTION_SAVE_REGION, ACTION_UPD
     ACTION_SAVE_NAME,
     ACTION_SHIFT_REGION_UP,
     ACTION_SHIFT_REGION_DOWN,
-    ACTION_CREATE_GROUP} from '../../containers/home/actions';
+    ACTION_CREATE_GROUP,
+    ACTION_ADD_CHILD} from '../../containers/home/actions';
 import addRegion from './add-region';
 import removeRegion from './remove-region';
 import config from './config';
@@ -16,6 +17,7 @@ import saveName from './save-name';
 import shiftRegionUp from './shift-region-up';
 import shiftRegionDown from './shift-region-down';
 import createGroup from './create-group';
+import addChild from './add-child';
 
 export const defaultRegions = () => {
     return {
@@ -59,6 +61,9 @@ export const regions = (state = defaultRegions(), {type, payload} = {}) => {
         }
         case ACTION_CREATE_GROUP: {
             return createGroup(state, payload);
+        }
+        case ACTION_ADD_CHILD: {
+            return addChild(state, payload);
         }
         default:
             return state;

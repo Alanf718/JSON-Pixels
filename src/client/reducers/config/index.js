@@ -10,6 +10,7 @@ const defaultConfig = () => {
 export const config = (state = defaultConfig(), {type, payload} = {}) => {
     switch (type) {
         case ACTION_REGION_MODE: {
+            if (payload === null) { return state; }
             return {...state, regionMode: payload};
         }
         case ACTION_TOGGLE_SAVE_REGION: {

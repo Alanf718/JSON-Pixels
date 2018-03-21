@@ -8,7 +8,8 @@ export const baseRegionNonResettable = () => {
         id: id,
         name: 'region_' + id,
         visible: true,
-        color: getRandomColour()
+        color: getRandomColour(),
+        grouped: false
     };
 };
 

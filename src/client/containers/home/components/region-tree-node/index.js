@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 
 import './style.scss';
 import { convertRegionTypeToMode } from '../../functions/utilities/converters';
+import { REGION_MODE_GROUP } from '../../actions';
 
 export class RegionTreeNode extends Component {
 
@@ -11,9 +12,13 @@ export class RegionTreeNode extends Component {
     }
 
     onClick() {
+        const mode = convertRegionTypeToMode(this.type);
         this.updateSelectedRegion({index: this.index});
         this.updateSelectedRegionID({});
-        this.updateRegionMode({mode: convertRegionTypeToMode(this.type)});
+        this.updateRegionMode({mode: mode});
+        if (mode === REGION_MODE_GROUP) {
+            this.toggleNodes({state: false});
+        }
     }
 
     onChange(evt) {
@@ -25,23 +30,25 @@ export class RegionTreeNode extends Component {
 
     /*eslint-disable*/
     render() {
-        const {name, visible, index, id, selected, type, readonly,
+        const {name, visible, index, id, selected, type, readonly, grouped,
             updateSelectedRegion, updateSelectedRegionID, updateRegionMode,
-            saveName} = this.props;
+            saveName, toggleNodes} = this.props;
         this.index = index;
         this.id = id;
         this.type = type;
         this.updateSelectedRegion = updateSelectedRegion;
         this.updateSelectedRegionID = updateSelectedRegionID;
         this.updateRegionMode = updateRegionMode;
+        this.toggleNodes = toggleNodes;
         this.saveName = saveName;
 
         const visibleClass = !visible ? 'hidden ' : '';
         const selectedClass = selected ? 'selected ' : '';
         const readonlyClass = !readonly ? 'editable ' : readonly + ' ';
+        const childClass = !grouped ? '' : grouped + ' ';
         return (
             <div onClick={() => this.onClick()}
-                className={visibleClass + selectedClass + 'region-tree-node'}
+                className={visibleClass + selectedClass + childClass + 'region-tree-node'}
                 key={id}
             >
                 <input className={readonlyClass + "node-name"} type="text" readOnly={readonly} 

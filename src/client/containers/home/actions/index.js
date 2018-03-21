@@ -210,12 +210,13 @@ export const ActionCreators = {
      * group, or adds a specified current region as a child
      * of the current group.
      * @param {number} [index=-1] [n]
+     * @param {string} mode Region mode to create child as.
      * @returns {{type: string, payload: number}} action
      */
-    addChild: ({index = -1}) => {
+    addChild: ({index = -1, mode}) => {
         return {
             type: ACTION_ADD_CHILD,
-            payload: index
+            payload: {index: index, mode: mode}
         };
     }
 };

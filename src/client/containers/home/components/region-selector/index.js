@@ -13,7 +13,8 @@ import { drawRectangleRegion } from '../../functions/rectangle-region/draw';
 import { drawPolygonRegion } from '../../functions/polygon-region/draw';
 import { REGION_MODE_RECTANGLE, REGION_MODE_POLYGON } from '../../actions';
 import { REGION_TYPE_RECTANGLE, REGION_TYPE_POLYGON, MOUSE_INPUT_PRESS, MOUSE_INPUT_DRAG,
-    MOUSE_INPUT_RELEASE, MOUSE_BUTTON_LEFT, MOUSE_BUTTON_MIDDLE, MOUSE_BUTTON_RIGHT } from '../../constants';
+    MOUSE_INPUT_RELEASE, MOUSE_BUTTON_LEFT, MOUSE_BUTTON_MIDDLE, MOUSE_BUTTON_RIGHT,
+    REGION_TYPE_GROUP } from '../../constants';
 import createRectangleRegion from '../../../../reducers/regions/default-region/rect-region';
 import createPolygonRegion from '../../../../reducers/regions/default-region/polygon-region';
 import { convertRegionTypeToMode } from '../../functions/utilities/converters';
@@ -106,15 +107,16 @@ export class RegionSelector extends Component {
         canvas.primitive().clear();
         for (let i = 0; i < this.regionList.length; i++)
         {
-            if (this.showNodes && i == this.regionConfig.selectedRegion) {
-                this.drawFilter(this.tempRegion, canvas);
-                this.drawNodes(this.tempRegion);
-            } else if (!this.regionList[i].saved) {
+            if(this.regionList[i].type === REGION_TYPE_GROUP) { continue; }
+            if (!this.regionList[i].saved) {
                 this.drawFilter(this.tempRegion, canvas);
             } else {
                 this.drawFilter(this.regionList[i], canvas);
             }        
         }
+        if (this.showNodes) {
+            this.drawNodes(this.tempRegion);
+        }        
     }
 
     /**
