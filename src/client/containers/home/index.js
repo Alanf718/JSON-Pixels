@@ -30,14 +30,18 @@ export class Home extends Component {
         const {regionMode, config, toggleNodes, toggleSaveRegion, regions,
             layers, addRegion, removeRegion, saveRegion, updateSelectedRegion,
             updateSelectedRegionID, resetRegion, tree, editName, saveName,
-            shiftRegionUp, shiftRegionDown, createGroup, addChild} = this.props;
+            shiftRegionUp, shiftRegionDown, createGroup, addChild, toggleFolded,
+            toggleVisibility} = this.props;
 
         /*eslint-disable*/
         const toggleNodesState = regions.config.showNodes;
         const isGroupRegion = config.regionMode === REGION_MODE_GROUP ? true : false;
         const removeRegionNextMode = regions.config.selectedRegion - 1 >= 0 && regions.config.selectedRegion - 1 < regions.list.length ?
             convertRegionTypeToMode(regions.list[regions.config.selectedRegion - 1].type) : null;
-
+        const visibleState = regions.config.selectedRegion >= 0 && regions.config.selectedRegion < regions.list.length ?
+            !regions.list[regions.config.selectedRegion].visible : null;
+        const foldedState = isGroupRegion ? !regions.list[regions.config.selectedRegion].folded : null;
+        
         return (
             <div className="frame-tags">
                 <div>
@@ -93,9 +97,9 @@ export class Home extends Component {
                         updateSelectedRegion({index: regions.config.selectedRegion + 1});
                         updateSelectedRegionID({id: regions.list[regions.config.selectedRegion].id});
                     }}>Add Child Polygon</button>
-
+                    
                     <pre id="debug">
-                        {JSON.stringify(config)}
+                        {JSON.stringify(regions.config)}
                     </pre>
                 </div>
                 <RegionTree
@@ -122,6 +126,12 @@ export class Home extends Component {
                     regionMode={regionMode}
                     mode={removeRegionNextMode}
                     isGroupRegion={isGroupRegion}
+                    regionList={regions.list}
+                    selectedRegion={regions.config.selectedRegion}
+                    toggleVisibility={toggleVisibility}
+                    visibilityState={visibleState}
+                    toggleFolded={toggleFolded}
+                    foldedState={foldedState}
                 />
             </div>
 

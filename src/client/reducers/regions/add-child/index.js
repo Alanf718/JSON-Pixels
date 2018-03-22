@@ -9,17 +9,18 @@ import { arrayMove } from '../../../containers/home/functions/utilities';
 const addChild = (state = defaultRegions(), payload = null) => {
     let obj = Object.assign({}, state);
 
-    console.log(obj.list[obj.config.selectedRegion].type, payload);
     if (obj.list[obj.config.selectedRegion].type !== REGION_TYPE_GROUP) { return state; }
 
     if (payload.index === null || payload.index < 0 || payload.index >= obj.list.length) {
         switch(payload.mode) {
             case REGION_MODE_POLYGON: 
-                obj.list.splice(obj.config.selectedRegion + 1, 0, Object.assign(createPolygonRegion(), {grouped: true}));
+                obj.list.splice(obj.config.selectedRegion + 1, 0, 
+                    Object.assign(createPolygonRegion(), {grouped: true, groupID: obj.list[obj.config.selectedRegion].id}));
                 break;
             case REGION_MODE_RECTANGLE:
             default:
-                obj.list.splice(obj.config.selectedRegion + 1, 0, Object.assign(createRectangleRegion(), {grouped: true}));
+                obj.list.splice(obj.config.selectedRegion + 1, 0, 
+                    Object.assign(createRectangleRegion(), {grouped: true, groupID: obj.list[obj.config.selectedRegion].id}));
                 break;
         }
         obj.list[obj.config.selectedRegion].numberOfChildren++;
@@ -36,7 +37,8 @@ const addChild = (state = defaultRegions(), payload = null) => {
     } else {
         obj.list[payload.index].grouped = true;
     }
-    
+    obj.list[payload.index].groupId = obj.list[obj.config.selectedRegion].id;
+
     obj.list = arrayMove(obj.list, payload.index, obj.config.selectedRegion + 1);
     obj.list[obj.config.selectedRegion].numberOfChildren++;
     obj.list[obj.config.selectedRegion].folded = false;

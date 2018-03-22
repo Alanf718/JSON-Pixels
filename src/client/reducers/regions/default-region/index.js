@@ -9,7 +9,8 @@ export const baseRegionNonResettable = () => {
         name: 'region_' + id,
         visible: true,
         color: getRandomColour(),
-        grouped: false
+        grouped: false,
+        groupID: -1
     };
 };
 
@@ -27,6 +28,11 @@ export const resetBaseRegion = (region) => {
 
 export const overwriteResettableRegionProperties = (oldRegion, newRegion) => {
     return Object.assign({}, newRegion, pick(oldRegion, Object.getOwnPropertyNames(baseRegionNonResettable())));
+};
+
+export const setBaseRegionGroupID = (region, id) => {
+    region.groupID = id;
+    return region;
 };
 
 const createBaseRegion = () => {

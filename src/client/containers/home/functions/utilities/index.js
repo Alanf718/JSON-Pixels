@@ -1,3 +1,5 @@
+import { REGION_TYPE_GROUP } from '../../constants';
+
 /**
  * Generate a random integer between specified upper
  * and lower bounds.
@@ -99,6 +101,7 @@ export const pick = function (object, properties) {
 
 export const arraySwap = function(arr, x, y) {
     arr[x] = arr.splice(y, 1, arr[x])[0];
+    return arr;
 };
 
 export const arrayMove = function (arr, x, y) {
@@ -116,4 +119,74 @@ export const arrayMove = function (arr, x, y) {
     }
     arr.splice(y, 0, arr.splice(x, 1)[0]);
     return arr;
+};
+
+export const getRegionTotalChildren = function (arr, x) {
+    let num = arr[x].numberOfChildren;
+    for (let i = x; i <= x + num; i++) {
+        if ( i != x && arr[i].type === REGION_TYPE_GROUP) {
+            num += arr[i].numberOfChildren;
+        }
+    }
+    return num;
+}
+
+export const groupShift = function (arr, x, direction) {
+    if (direction < 0) {
+        let end =  x + arr[x].numberOfChildren;
+        for (let i = x; i <= end; i++) {
+            if ( i != x && arr[i].type === REGION_TYPE_GROUP) {
+                end += arr[i].numberOfChildren;
+            }
+            arr = arraySwap(arr, i, i-1);
+        }
+    } else {
+        let start = getRegionTotalChildren(arr, x);
+        for (let i = start; i >= x; i--) {
+            arr = arraySwap(arr, i, i+1);
+        }
+    }
+
+    return arr;
+};
+
+export const retrieveParentGroup = function (arr, x) {
+    for (let i = x; i >= 0; i--) {
+        if (arr[x].groupID === arr[i].id) {
+            return arr[i];
+        }
+    }
+};
+
+export const retrieveNearestSiblingIndex = function (arr, x, direction) {
+    if (direction < 0) {
+        for (let i = x - 1; i >= 0; i--) {
+            if (arr[i].groupID === arr[x].groupID) {
+                return i;
+            }
+        }
+        return arr[x].groupID >= 0 ? x : 0;
+    } else {
+        for (let i = x + 1; i < arr.length; i++) {
+            if (arr[i].groupID === arr[x].groupID) {
+                if (arr[i].type === REGION_TYPE_GROUP) {
+                    return i + getRegionTotalChildren(arr, i);
+                }
+                return i;
+            }
+        }
+        return arr[x].groupID >= 0 ? x : arr.length - 1;
+    }
+};
+
+export const canShiftRegionUp = function (arr, x) {
+    return retrieveNearestSiblingIndex(arr, x, -1) !== x && x - 1 >= 0 ? true : false;
+};
+
+export const canShiftRegionDown = function (arr, x) {
+    if (arr[x].type === REGION_TYPE_GROUP) {
+        return x + getRegionTotalChildren(arr, x) < arr.length - 1 ? true : false;
+    }
+
+    return retrieveNearestSiblingIndex(arr, x, 1) !== x && x + 1 < arr.length ? true : false;
 };

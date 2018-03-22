@@ -16,6 +16,8 @@ export const ACTION_EDIT_NAME = 'ACTION-EDIT-NAME';
 export const ACTION_SAVE_NAME = 'ACTION-SAVE-NAME';
 export const ACTION_CREATE_GROUP = 'ACTION-CREATE-GROUP';
 export const ACTION_ADD_CHILD = 'ACTION-ADD-CHILD';
+export const ACTION_TOGGLE_FOLDED = 'ACTION-TOGGLE-FOLDED';
+export const ACTION_TOGGLE_VISBILITY = 'ACTION-TOGGLE-VISIBILITY';
 
 //================================================================================
 // Action-Related Constants
@@ -217,6 +219,34 @@ export const ActionCreators = {
         return {
             type: ACTION_ADD_CHILD,
             payload: {index: index, mode: mode}
+        };
+    },
+
+    /**
+     * Toggles whether the specified group currently has it's
+     * children nodes folded or not.
+     * @param {number} [index=-1] [n]
+     * @param {boolean} state Folded or not.
+     * @returns {{type: string, payload: {number, boolean}}} action
+     */
+    toggleFolded: ({index = -1, state}) => {
+        return {
+            type: ACTION_TOGGLE_FOLDED,
+            payload: {index: index, state: state}
+        };
+    },
+
+    /**
+     * Toggles whether the specified region or group of
+     * regions is visble or not.
+     * @param {number} [index=-1] [n]
+     * @param {boolean} state Visible or not.
+     * @returns {{type: string, payload: {number, boolean}}} action
+     */
+    toggleVisibility: ({index = -1, state}) => {
+        return {
+            type: ACTION_TOGGLE_VISBILITY,
+            payload: {index: index, state: state}
         };
     }
 };

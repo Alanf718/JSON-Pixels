@@ -105,9 +105,20 @@ export class RegionSelector extends Component {
     draw() {
         const {canvas} = this;
         canvas.primitive().clear();
+
+        let childCounter = 0;
+        let visible = true;
+
         for (let i = 0; i < this.regionList.length; i++)
         {
-            if(this.regionList[i].type === REGION_TYPE_GROUP) { continue; }
+            if(this.regionList[i].type === REGION_TYPE_GROUP) { 
+                childCounter += this.regionList[i].numberOfChildren;
+                visible = this.regionList[i].visible;
+                continue;
+            }
+            if (childCounter <= 0) { visible = this.regionList[i].visible; } else { childCounter--; }
+            if(!visible) {continue;}
+
             if (!this.regionList[i].saved) {
                 this.drawFilter(this.tempRegion, canvas);
             } else {

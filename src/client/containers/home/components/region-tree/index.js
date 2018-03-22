@@ -18,26 +18,43 @@ export class RegionTree extends Component {
         const {regions, selectedID, updateSelectedRegion, updateSelectedRegionID,
             regionMode, readonly, saveName, toggleNodes} = this.props;
         let index = -1;
+        let isChild = false;        
         let childCounter = 0;
+        let folded = false;
+        let renderOnce = false;
+
         return (
             <div className="region-tree">
                 {
                     regions.map(child => {
                         index++;
-                        let isChild = childCounter > 0 ? 'child' : false;
-                        childCounter = childCounter > 0 ? childCounter - 1 : 0;
-                        
+                        renderOnce = false;
+
+                        if (childCounter > 0) {
+                            isChild = 'child';
+                            childCounter--;
+                        } else {
+                            isChild = false;
+                            folded = false;
+                        }
+
                         if (child.type === REGION_TYPE_GROUP) {
                             childCounter += child.numberOfChildren;
                             isChild = false;
+                            if (child.folded && !folded) {
+                                folded = true;
+                                renderOnce = true;
+                            }
                         }
+
                         const selected = selectedID === child.id ? true : false;
                         const isReadonly = selected && !readonly ? false : 'readonly';
+                        const visible = !folded || renderOnce ? true : false;
 
                         return (
                             <RegionTreeNode
                                 name={child.name}
-                                visible={child.visible}
+                                visible={visible}
                                 index={index}
                                 id={child.id}
                                 key={child.id}

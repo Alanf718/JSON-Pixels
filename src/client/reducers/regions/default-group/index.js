@@ -7,7 +7,8 @@ export const baseGroupNonResettable = () => {
         id: id,
         name: 'group_' + id,
         type: REGION_TYPE_GROUP,
-        visible: true
+        visible: true,
+        groupID: -1
     };
 };
 
