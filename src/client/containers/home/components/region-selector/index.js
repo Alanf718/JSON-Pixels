@@ -14,7 +14,7 @@ import { drawPolygonRegion } from '../../functions/polygon-region/draw';
 import { REGION_MODE_RECTANGLE, REGION_MODE_POLYGON } from '../../actions';
 import { REGION_TYPE_RECTANGLE, REGION_TYPE_POLYGON, MOUSE_INPUT_PRESS, MOUSE_INPUT_DRAG,
     MOUSE_INPUT_RELEASE, MOUSE_BUTTON_LEFT, MOUSE_BUTTON_MIDDLE, MOUSE_BUTTON_RIGHT,
-    REGION_TYPE_GROUP } from '../../constants';
+    REGION_TYPE_GROUP, CANVAS_PIXEL_WIDTH, CANVAS_PIXEL_HEIGHT} from '../../constants';
 import createRectangleRegion from '../../../../reducers/regions/default-region/rect-region';
 import createPolygonRegion from '../../../../reducers/regions/default-region/polygon-region';
 import { convertRegionTypeToMode } from '../../functions/utilities/converters';
@@ -24,7 +24,7 @@ export class RegionSelector extends Component {
     /* eslint-disable */    
     constructor(props) {
         super(props);
-        const {regionMode, regionList, regionConfig, showNodes, addRegion} = this.props;
+        const {regionMode, regionList, regionConfig, showNodes, addRegion, sprite} = this.props;
         this.tempRegion = null;
         this.regionMode = regionMode;
         this.regionList = regionList;
@@ -32,6 +32,7 @@ export class RegionSelector extends Component {
         this.showNodes = showNodes;
         addRegion({mode: regionMode});
         this.tempRegion = regionList[regionConfig.selectedRegion];
+        this.sprite = sprite;
     }
 
 
@@ -98,6 +99,16 @@ export class RegionSelector extends Component {
         }
     }
 
+    drawSprite() {
+        if (!this.sprite.loaded) { return; }  
+        this.ctx.drawImage(
+            this.sprite.img,
+            this.sprite.x,
+            this.sprite.y,
+            this.sprite.w,
+            this.sprite.h);
+    }
+
     /**
      * Draws all entities, both saved and temporary
      * where appropriae, to the canvas.
@@ -109,6 +120,7 @@ export class RegionSelector extends Component {
         let childCounter = 0;
         let visible = true;
 
+        this.drawSprite();
         for (let i = 0; i < this.regionList.length; i++)
         {
             if(this.regionList[i].type === REGION_TYPE_GROUP) { 
@@ -117,7 +129,7 @@ export class RegionSelector extends Component {
                 continue;
             }
             if (childCounter <= 0) { visible = this.regionList[i].visible; } else { childCounter--; }
-            if(!visible) {continue;}
+            if(!visible) { continue; }
 
             if (!this.regionList[i].saved) {
                 this.drawFilter(this.tempRegion, canvas);
@@ -331,7 +343,8 @@ export class RegionSelector extends Component {
 
     render() {
         const {regionMode, regionList, regionConfig, layerConfig, toggleNodes, saveRegion,
-            saveRegionAction, updateSelectedRegion, updateSelectedRegionID, resetRegion} = this.props;
+            saveRegionAction, updateSelectedRegion, updateSelectedRegionID, resetRegion,
+            sprite} = this.props;
         this.regionMode = regionMode;
         this.regionList = regionList;
         this.regionConfig = {...regionConfig};
@@ -341,9 +354,11 @@ export class RegionSelector extends Component {
         this.saveRegion = saveRegionAction;
         this.updateSelectedRegion = updateSelectedRegion;
         this.updateSelectedRegionID = updateSelectedRegionID;
+        this.sprite = sprite;
         return (
             <div className="display">
-                <canvas width="640" height="480" onContextMenu={this.contextMenu}/>
+                <canvas width={CANVAS_PIXEL_WIDTH.toString()} height={CANVAS_PIXEL_HEIGHT.toString()} 
+                    onContextMenu={this.contextMenu}/>
             </div>
         );
     }

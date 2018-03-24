@@ -12,6 +12,7 @@ const addChild = (state = defaultRegions(), payload = null) => {
     if (obj.list[obj.config.selectedRegion].type !== REGION_TYPE_GROUP) { return state; }
 
     if (payload.index === null || payload.index < 0 || payload.index >= obj.list.length) {
+        console.log(payload.mode);
         switch(payload.mode) {
             case REGION_MODE_POLYGON: 
                 obj.list.splice(obj.config.selectedRegion + 1, 0, 

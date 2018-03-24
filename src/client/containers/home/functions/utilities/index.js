@@ -132,17 +132,13 @@ export const getRegionTotalChildren = function (arr, x) {
 }
 
 export const groupShift = function (arr, x, direction) {
+    let lastGroupIndex = x + getRegionTotalChildren(arr, x);    
     if (direction < 0) {
-        let end =  x + arr[x].numberOfChildren;
-        for (let i = x; i <= end; i++) {
-            if ( i != x && arr[i].type === REGION_TYPE_GROUP) {
-                end += arr[i].numberOfChildren;
-            }
+        for (let i = x; i <= lastGroupIndex; i++) {
             arr = arraySwap(arr, i, i-1);
         }
     } else {
-        let start = getRegionTotalChildren(arr, x);
-        for (let i = start; i >= x; i--) {
+        for (let i = lastGroupIndex; i >= x; i--) {
             arr = arraySwap(arr, i, i+1);
         }
     }

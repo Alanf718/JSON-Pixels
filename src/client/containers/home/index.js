@@ -26,14 +26,26 @@ export class Home extends Component {
         super(props);
     }
 
+    /*eslint-disable*/    
+    handleSpriteInputChange(files, loadSprite, spriteLoaded) {
+        let func = loadSprite;
+        let callback = spriteLoaded;
+        if (files && files[0]) {
+            var FR = new FileReader();
+            FR.onload = function(e) {
+                func({src: e.target.result, callback: callback});
+            };
+            FR.readAsDataURL(files[0]);
+        }
+    }
+
     render() {
         const {regionMode, config, toggleNodes, toggleSaveRegion, regions,
             layers, addRegion, removeRegion, saveRegion, updateSelectedRegion,
             updateSelectedRegionID, resetRegion, tree, editName, saveName,
             shiftRegionUp, shiftRegionDown, createGroup, addChild, toggleFolded,
-            toggleVisibility} = this.props;
+            toggleVisibility, loadSprite, spriteLoaded} = this.props;
 
-        /*eslint-disable*/
         const toggleNodesState = regions.config.showNodes;
         const isGroupRegion = config.regionMode === REGION_MODE_GROUP ? true : false;
         const removeRegionNextMode = regions.config.selectedRegion - 1 >= 0 && regions.config.selectedRegion - 1 < regions.list.length ?
@@ -41,7 +53,6 @@ export class Home extends Component {
         const visibleState = regions.config.selectedRegion >= 0 && regions.config.selectedRegion < regions.list.length ?
             !regions.list[regions.config.selectedRegion].visible : null;
         const foldedState = isGroupRegion ? !regions.list[regions.config.selectedRegion].folded : null;
-        
         return (
             <div className="frame-tags">
                 <div>
@@ -59,7 +70,11 @@ export class Home extends Component {
                         resetRegion={resetRegion}
                         updateSelectedRegion={updateSelectedRegion}
                         updateSelectedRegionID={updateSelectedRegionID}
+                        sprite={config.sprite}                        
                     />
+                    <input type='file' id="inputSpriteUpload"
+                        onChange={(e) => this.handleSpriteInputChange(e.target.files, loadSprite, spriteLoaded)}/>
+                    <br/>
                     <button onClick={() => {
                         addRegion({mode: config.regionMode});
                         updateSelectedRegion({index: regions.list.length - 1});
@@ -86,20 +101,20 @@ export class Home extends Component {
 
                     <button disabled={!isGroupRegion} onClick={() => {
                         regionMode({mode: REGION_MODE_RECTANGLE});
-                        addChild({mode: config.regionMode, index: -1});
+                        addChild({mode: REGION_MODE_RECTANGLE, index: -1});
                         updateSelectedRegion({index: regions.config.selectedRegion + 1});
                         updateSelectedRegionID({id: regions.list[regions.config.selectedRegion].id});
                     }}>Add Child Rectangle</button>
 
                     <button disabled={!isGroupRegion} onClick={() => {
                         regionMode({mode: REGION_MODE_POLYGON});
-                        addChild({mode: config.regionMode, index: -1});
+                        addChild({mode: REGION_MODE_POLYGON, index: -1});
                         updateSelectedRegion({index: regions.config.selectedRegion + 1});
                         updateSelectedRegionID({id: regions.list[regions.config.selectedRegion].id});
                     }}>Add Child Polygon</button>
                     
                     <pre id="debug">
-                        {JSON.stringify(regions.config)}
+                        {JSON.stringify()}
                     </pre>
                 </div>
                 <RegionTree
@@ -134,7 +149,6 @@ export class Home extends Component {
                     foldedState={foldedState}
                 />
             </div>
-
         );
     }
 }

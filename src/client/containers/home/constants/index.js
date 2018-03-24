@@ -32,3 +32,9 @@ export const MOUSE_INPUT_RELEASE = 'release';
 export const MOUSE_BUTTON_LEFT = 0;
 export const MOUSE_BUTTON_MIDDLE = 1;
 export const MOUSE_BUTTON_RIGHT = 2;
+
+//================================================================================
+// Canvas Details
+//================================================================================
+export const CANVAS_PIXEL_WIDTH = 640;
+export const CANVAS_PIXEL_HEIGHT = 480;

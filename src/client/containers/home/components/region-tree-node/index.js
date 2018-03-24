@@ -3,6 +3,7 @@ import React, {Component} from 'react';
 import './style.scss';
 import { convertRegionTypeToMode } from '../../functions/utilities/converters';
 import { REGION_MODE_GROUP } from '../../actions';
+import { REGION_TYPE_GROUP } from '../../constants';
 
 export class RegionTreeNode extends Component {
 
@@ -46,9 +47,11 @@ export class RegionTreeNode extends Component {
         const selectedClass = selected ? 'selected ' : '';
         const readonlyClass = !readonly ? 'editable ' : readonly + ' ';
         const childClass = !grouped ? '' : grouped + ' ';
+        const groupClass = type === REGION_TYPE_GROUP ? 'group ' : '';
+
         return (
             <div onClick={() => this.onClick()}
-                className={visibleClass + selectedClass + childClass + 'region-tree-node'}
+                className={visibleClass + selectedClass + groupClass + childClass + 'region-tree-node'}
                 key={id}
             >
                 <input className={readonlyClass + "node-name"} type="text" readOnly={readonly} 

@@ -18,6 +18,8 @@ export const ACTION_CREATE_GROUP = 'ACTION-CREATE-GROUP';
 export const ACTION_ADD_CHILD = 'ACTION-ADD-CHILD';
 export const ACTION_TOGGLE_FOLDED = 'ACTION-TOGGLE-FOLDED';
 export const ACTION_TOGGLE_VISBILITY = 'ACTION-TOGGLE-VISIBILITY';
+export const ACTION_LOAD_SPRITE = 'ACTION-LOAD-SPRITE';
+export const ACTION_SPRITE_LOADED = 'ACTION-SPRITE-LOADED';
 
 //================================================================================
 // Action-Related Constants
@@ -248,5 +250,29 @@ export const ActionCreators = {
             type: ACTION_TOGGLE_VISBILITY,
             payload: {index: index, state: state}
         };
-    }
+    },
+
+    /**
+     * Toggles whether the specified region or group of
+     * regions is visble or not.
+     * @param {string} src The source for the loaded image.
+     * @param {function} callback The function to call when the image loads.
+     * @returns {{type: string, payload: {string, function}}} action
+     */
+    loadSprite: ({src, callback}) => {
+        return {
+            type: ACTION_LOAD_SPRITE,
+            payload: {src: src, callback: callback}
+        };
+    },
+
+    /**
+     * Sets that the current sprite has loaded.
+     * @returns {{type: string}} action
+     */
+    spriteLoaded: () => {
+        return {
+            type: ACTION_SPRITE_LOADED,
+        };
+    },
 };

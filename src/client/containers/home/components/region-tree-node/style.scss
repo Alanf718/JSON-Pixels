@@ -16,6 +16,11 @@ div.region-tree-node {
 
 div.child {
     background-color: indianred;
+    margin-left: 15px;
+}
+
+div.group {
+    background-color: lightgreen;
 }
 
 .hidden {
@@ -23,7 +28,7 @@ div.child {
 }
 
 .selected {
-    background-color: lightblue;
+    background-color: lightblue !important;
     &:hover {
         background-color: lightblue !important;
     }
