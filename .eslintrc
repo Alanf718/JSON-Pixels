@@ -88,7 +88,7 @@
     "no-new-require": 2,
     "no-path-concat": 2,
     // Stylistic Issues
-    "indent": 2, // 4 spaces
+    "indent": [2, 4, {"SwitchCase": 1}], // 4 spaces
     "camelcase": 2,
     "comma-spacing": [2, {"before": false, "after": true}],
     "comma-style": [2, "last"],

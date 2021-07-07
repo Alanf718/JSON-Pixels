@@ -1,0 +1,35 @@
+div.region-tree-node {
+    height: 30px;
+    width: 100%;
+    &:hover {
+        background-color: lightgray;
+    }
+    p {
+        color: #222;
+    }
+
+    .readonly {
+        background-color: transparent;
+        border: none;
+    }
+}
+
+div.child {
+    background-color: indianred;
+    margin-left: 15px;
+}
+
+div.group {
+    background-color: lightgreen;
+}
+
+.hidden {
+    display: none;
+}
+
+.selected {
+    background-color: lightblue !important;
+    &:hover {
+        background-color: lightblue !important;
+    }
+}
